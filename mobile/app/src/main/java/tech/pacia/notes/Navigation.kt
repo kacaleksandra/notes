@@ -31,7 +31,7 @@ fun NotesNavHost(
         composable(Destinations.HOME_ROUTE) {
             HomeRoute(
                 onNavigateToNote = { noteId ->
-                    navController.navigate("notes/${noteId}")
+                    navController.navigate("note/${noteId}")
                 },
             )
         }

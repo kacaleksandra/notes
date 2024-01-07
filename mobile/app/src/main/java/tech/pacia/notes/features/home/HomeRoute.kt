@@ -11,6 +11,6 @@ fun HomeRoute(
     onNavigateToNote: (noteId: String) -> Unit,
 ) {
     HomeScreen(
-        onNavigateToNote = onNavigateToNote
+        onNavigateToNote = onNavigateToNote,
     )
 }

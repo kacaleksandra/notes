@@ -1,5 +1,6 @@
 package tech.pacia.notes.features.signin
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -59,8 +61,11 @@ fun SignInScreen(
 
     Scaffold(
         modifier = modifier
-            .pointerInput(Unit) { detectTapGestures(onTap = { localFocusManager.clearFocus() }) },
-        topBar = { TopAppBar(title = { Text("Notes") }) },
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = { localFocusManager.clearFocus() })
+            },
+        topBar = { TopAppBar(title = { Text("Sign in to Notes") }) },
     ) { padding ->
         Column(
             modifier = Modifier
@@ -116,6 +121,16 @@ fun SignInScreen(
             ) {
                 Text("Sign in")
             }
+
+            Button(
+                onClick = { onSignInSubmitted("bartek", "123") },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                modifier = Modifier
+                    .fillMaxWidth(fraction = 0.75f)
+                    .padding(8.dp),
+            ) {
+                Text("Sign in (debug)")
+            }
         }
     }
 
@@ -165,7 +180,7 @@ fun SignInScreen(
 
 }
 
-@Preview(uiMode = UI_MODE_NIGHT_YES, showSystemUi = true)
+@Preview(uiMode = UI_MODE_NIGHT_NO, showSystemUi = true)
 @Composable
 fun SignInScreenPreview() {
     NotesTheme {
