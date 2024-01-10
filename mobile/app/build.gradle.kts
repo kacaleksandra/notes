@@ -55,11 +55,17 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+}
 
-    detekt {
-        config.setFrom(file("../detekt.yaml"))
-        buildUponDefaultConfig = true
-        autoCorrect = true
+detekt {
+    config.setFrom(file("../detekt.yaml"))
+    buildUponDefaultConfig = true
+    autoCorrect = true
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
