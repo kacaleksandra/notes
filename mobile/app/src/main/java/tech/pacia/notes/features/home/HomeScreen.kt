@@ -1,5 +1,6 @@
 package tech.pacia.notes.features.home
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -25,15 +26,13 @@ import tech.pacia.notes.ui.theme.NotesTheme
 fun HomeScreen(
     modifier: Modifier = Modifier,
     onNavigateToNote: (noteId: String) -> Unit = {},
-    notesViewModel: NotesViewModel =
-        viewModel(
-            factory = NotesViewModel.Factory,
-            extras =
-                MutableCreationExtras().apply {
-                    // FIXME: Ugly hack to work around the lack of proper DI
-                    set(NotesRepository.VM_KEY, NotesRepository())
-                },
-        ),
+    notesViewModel: NotesViewModel = viewModel(
+        factory = NotesViewModel.Factory,
+        extras = MutableCreationExtras().apply {
+            // FIXME: Ugly hack to work around the lack of proper DI
+            set(NotesRepository.VM_KEY, NotesRepository())
+        },
+    ),
 ) {
     HomeScreen(
         modifier = modifier,
@@ -62,9 +61,9 @@ fun HomeScreen(
         LazyVerticalStaggeredGrid(
             modifier = Modifier.padding(paddingValues),
             columns = StaggeredGridCells.Fixed(2),
-            verticalItemSpacing = 4.dp,
-            contentPadding = PaddingValues(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalItemSpacing = 8.dp,
+            contentPadding = PaddingValues(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             items(
                 items = notes,
@@ -85,9 +84,19 @@ fun HomeScreen(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showSystemUi = true)
 @Composable
 fun HomeScreenPreview() {
+    NotesTheme {
+        HomeScreen(
+            notes = NotesRepository.notes,
+        )
+    }
+}
+
+@Preview(showSystemUi = true, uiMode = UI_MODE_NIGHT_YES)
+@Composable
+fun HomeScreenPreviewDark() {
     NotesTheme {
         HomeScreen(
             notes = NotesRepository.notes,

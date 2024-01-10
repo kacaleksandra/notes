@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import tech.pacia.notes.ui.theme.NotesTheme
 
@@ -25,13 +26,16 @@ fun NoteScreen(
 ) {
     Scaffold(
         modifier = modifier,
-        topBar = { TopAppBar(title = { Text(title) }) },
+        topBar = {
+            TopAppBar(title = {
+                Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            })
+        },
     ) { paddingValues ->
         Box(
-            modifier =
-                Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize(),
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize(),
         ) {
             Text(
                 modifier = Modifier.align(Alignment.Center),
@@ -58,7 +62,7 @@ fun NoteScreenPreview() {
 fun SignInScreenPreview() {
     NotesTheme {
         NoteScreen(
-            title = "My first note",
+            title = "My first note with way too long text that overflows",
             onNavigateUp = {},
         )
     }

@@ -44,7 +44,7 @@ class NotesViewModel(private val notesRepository: NotesRepository) : ViewModel()
                     val notesRepository = checkNotNull(extras[NotesRepository.VM_KEY])
 
                     return NotesViewModel(
-                        notesRepository = notesRepository as NotesRepository,
+                        notesRepository = notesRepository,
                     ) as T
                 }
             }
