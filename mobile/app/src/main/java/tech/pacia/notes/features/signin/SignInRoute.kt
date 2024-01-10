@@ -8,9 +8,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import tech.pacia.notes.ui.theme.NotesTheme
 
 @Composable
-fun SignInRoute(
-    onNavigateToHome: () -> Unit = {},
-) {
+fun SignInRoute(onNavigateToHome: () -> Unit = {}) {
     val signInViewModel: SignInViewModel = viewModel(modelClass = SignInViewModel::class.java)
 
     val inProgress = signInViewModel.inProgress.collectAsState().value
@@ -25,7 +23,6 @@ fun SignInRoute(
         },
     )
 }
-
 
 @Composable
 @Preview(showSystemUi = true)

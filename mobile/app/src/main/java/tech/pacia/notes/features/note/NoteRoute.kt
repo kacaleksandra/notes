@@ -11,6 +11,6 @@ fun NoteRoute(
 
     NoteScreen(
         title = "My first note",
-        onNavigateUp = onNavigateUp
+        onNavigateUp = onNavigateUp,
     )
 }

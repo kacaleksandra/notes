@@ -1,5 +1,7 @@
 package tech.pacia.notes.data
 
+import androidx.lifecycle.viewmodel.CreationExtras
+
 data class Note(
     val id: String,
     val title: String,
@@ -19,53 +21,37 @@ class NotesRepository {
             }
         }
     }
+
+    companion object {
+        val VM_KEY = object : CreationExtras.Key<NotesRepository> {}
+
+        val notes =
+            mutableListOf(
+                Note(
+                    id = "1",
+                    title = "Hey there!",
+                    content = "This is a note. You can edit it by clicking on it.",
+                ),
+                Note(
+                    id = "2",
+                    title = "This is a very long title that will be truncated",
+                    content = "This is a note. You can edit it by clicking on it.",
+                ),
+                Note(
+                    id = "3",
+                    title = "This is a very long title that will be truncated",
+                    content = "This is a note. You can edit it by clicking on it.",
+                ),
+                Note(
+                    id = "4",
+                    title = "This is a very long title that will be truncated",
+                    content = "This is a note. You can edit it by clicking on it.",
+                ),
+                Note(
+                    id = "5",
+                    title = "This is a very long title that will be truncated",
+                    content = "This is a note. You can edit it by clicking on it.",
+                ),
+            )
+    }
 }
-
-
-val notes = mutableListOf(
-    Note(
-        id = "1",
-        title = "Hey there!",
-        content = "This is a note. You can edit it by clicking on it.",
-    ),
-    Note(
-        id = "2",
-        title = "This is a very long title that will be truncated",
-        content = "This is a note. You can edit it by clicking on it.",
-    ),
-    Note(
-        id = "3",
-        title = "This is a very long title that will be truncated",
-        content = "This is a note. You can edit it by clicking on it.",
-    ),
-    Note(
-        id = "4",
-        title = "This is a very long title that will be truncated",
-        content = "This is a note. You can edit it by clicking on it.",
-    ),
-    Note(
-        id = "5",
-        title = "This is a very long title that will be truncated",
-        content = "This is a note. You can edit it by clicking on it.",
-    ),
-    Note(
-        id = "6",
-        title = "This is a very long title that will be truncated",
-        content = "This is a note. You can edit it by clicking on it.",
-    ),
-    Note(
-        id = "7",
-        title = "This is a very long title that will be truncated",
-        content = "This is a note. You can edit it by clicking on it.",
-    ),
-    Note(
-        id = "8",
-        title = "This is a very long title that will be truncated",
-        content = "This is a note. You can edit it by clicking on it.",
-    ),
-    Note(
-        id = "9",
-        title = "This is a very long title that will be truncated",
-        content = "This is a note. You can edit it by clicking on it.",
-    ),
-)

@@ -29,7 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -60,17 +59,20 @@ fun SignInScreen(
     val localFocusManager = LocalFocusManager.current
 
     Scaffold(
-        modifier = modifier
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onTap = { localFocusManager.clearFocus() })
-            },
+        modifier =
+            modifier
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onTap = { localFocusManager.clearFocus() },
+                    )
+                },
         topBar = { TopAppBar(title = { Text("Sign in to Notes") }) },
     ) { padding ->
         Column(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .padding(padding)
+                    .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             OutlinedTextField(
@@ -115,9 +117,10 @@ fun SignInScreen(
 
             Button(
                 onClick = { onSignInSubmitted(username, password) },
-                modifier = Modifier
-                    .fillMaxWidth(fraction = 0.75f)
-                    .padding(8.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth(fraction = 0.75f)
+                        .padding(8.dp),
             ) {
                 Text("Sign in")
             }
@@ -125,9 +128,10 @@ fun SignInScreen(
             Button(
                 onClick = { onSignInSubmitted("bartek", "123") },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                modifier = Modifier
-                    .fillMaxWidth(fraction = 0.75f)
-                    .padding(8.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth(fraction = 0.75f)
+                        .padding(8.dp),
             ) {
                 Text("Sign in (debug)")
             }
@@ -136,14 +140,15 @@ fun SignInScreen(
 
     if (inProgress) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = Color.Transparent)
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }, // This is mandatory
-                    onClick = { /* block interactions with other UI */ },
-                )
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(color = Color.Transparent)
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }, // This is mandatory
+                        onClick = { /* block interactions with other UI */ },
+                    ),
         ) {
             Column(
                 modifier = Modifier.align(Alignment.Center),
@@ -177,7 +182,6 @@ fun SignInScreen(
             },
         )
     }
-
 }
 
 @Preview(uiMode = UI_MODE_NIGHT_NO, showSystemUi = true)

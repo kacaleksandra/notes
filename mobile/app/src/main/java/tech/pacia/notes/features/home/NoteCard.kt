@@ -25,10 +25,11 @@ fun NoteCard(
     onLongClick: () -> Unit = {},
 ) {
     Card(
-        modifier = modifier.combinedClickable(
-            onClick = onClick,
-            onLongClick = onLongClick,
-        ),
+        modifier =
+            modifier.combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick,
+            ),
         shape = RoundedCornerShape(8.dp),
     ) {
         Column(

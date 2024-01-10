@@ -16,9 +16,7 @@ private object Destinations {
 }
 
 @Composable
-fun NotesNavHost(
-    navController: NavHostController = rememberNavController(),
-) {
+fun NotesNavHost(navController: NavHostController = rememberNavController()) {
     NavHost(
         navController = navController,
         startDestination = Destinations.SIGN_IN_ROUTE,
@@ -31,7 +29,7 @@ fun NotesNavHost(
         composable(Destinations.HOME_ROUTE) {
             HomeRoute(
                 onNavigateToNote = { noteId ->
-                    navController.navigate("note/${noteId}")
+                    navController.navigate("note/$noteId")
                 },
             )
         }

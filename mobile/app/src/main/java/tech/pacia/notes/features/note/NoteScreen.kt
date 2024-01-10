@@ -28,9 +28,10 @@ fun NoteScreen(
         topBar = { TopAppBar(title = { Text(title) }) },
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
+            modifier =
+                Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize(),
         ) {
             Text(
                 modifier = Modifier.align(Alignment.Center),
