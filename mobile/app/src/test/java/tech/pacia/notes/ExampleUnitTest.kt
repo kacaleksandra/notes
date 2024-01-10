@@ -1,6 +1,6 @@
 package tech.pacia.notes
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**

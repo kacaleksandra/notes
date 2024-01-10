@@ -1,0 +1,24 @@
+name: prepare
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: mobile
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Run unit tests
+        run: ./gradlew :app:testDebugUnitTest
+
+      - name: Run detekt
+        run: ./gradlew :app:detekt

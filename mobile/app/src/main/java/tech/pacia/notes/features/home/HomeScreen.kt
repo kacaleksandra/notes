@@ -29,7 +29,7 @@ fun HomeScreen(
     notesViewModel: NotesViewModel = viewModel(
         factory = NotesViewModel.Factory,
         extras = MutableCreationExtras().apply {
-            // FIXME: Ugly hack to work around the lack of proper DI
+            // TODO: Ugly hack to work around the lack of proper DI
             set(NotesRepository.VM_KEY, NotesRepository())
         },
     ),

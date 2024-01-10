@@ -6,7 +6,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
@@ -60,19 +66,19 @@ fun SignInScreen(
 
     Scaffold(
         modifier =
-            modifier
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onTap = { localFocusManager.clearFocus() },
-                    )
-                },
+        modifier
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = { localFocusManager.clearFocus() },
+                )
+            },
         topBar = { TopAppBar(title = { Text("Sign in to Notes") }) },
     ) { padding ->
         Column(
             modifier =
-                Modifier
-                    .padding(padding)
-                    .fillMaxWidth(),
+            Modifier
+                .padding(padding)
+                .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             OutlinedTextField(
@@ -118,9 +124,9 @@ fun SignInScreen(
             Button(
                 onClick = { onSignInSubmitted(username, password) },
                 modifier =
-                    Modifier
-                        .fillMaxWidth(fraction = 0.75f)
-                        .padding(8.dp),
+                Modifier
+                    .fillMaxWidth(fraction = 0.75f)
+                    .padding(8.dp),
             ) {
                 Text("Sign in")
             }
@@ -129,9 +135,9 @@ fun SignInScreen(
                 onClick = { onSignInSubmitted("bartek", "123") },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                 modifier =
-                    Modifier
-                        .fillMaxWidth(fraction = 0.75f)
-                        .padding(8.dp),
+                Modifier
+                    .fillMaxWidth(fraction = 0.75f)
+                    .padding(8.dp),
             ) {
                 Text("Sign in (debug)")
             }
@@ -141,14 +147,14 @@ fun SignInScreen(
     if (inProgress) {
         Box(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .background(color = Color.Transparent)
-                    .clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }, // This is mandatory
-                        onClick = { /* block interactions with other UI */ },
-                    ),
+            Modifier
+                .fillMaxSize()
+                .background(color = Color.Transparent)
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }, // This is mandatory
+                    onClick = { /* block interactions with other UI */ },
+                ),
         ) {
             Column(
                 modifier = Modifier.align(Alignment.Center),

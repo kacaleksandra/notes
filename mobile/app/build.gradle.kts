@@ -1,6 +1,9 @@
+import io.gitlab.arturbosch.detekt.Detekt
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.detekt)
 }
 
 android {
@@ -24,7 +27,10 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 
@@ -47,13 +53,14 @@ android {
 
     packaging {
         resources {
-            excludes += "META-INF/"
-            excludes += "okhttp3/"
-            excludes += "kotlin/"
-            excludes += "org/"
-            excludes += ".properties"
-            excludes += ".bin"
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+
+    tasks.withType<Detekt> {
+        config.setFrom(file("../detekt.yaml"))
+        buildUponDefaultConfig = true
+        autoCorrect = true
     }
 }
 
@@ -75,4 +82,7 @@ dependencies {
     androidTestImplementation(libs.ui.test.junit4)
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
+    // lintChecks("com.slack.lint.compose:compose-lint-checks:1.2.0")
+    // detektPlugins(libs. "io.gitlab.arturbosch.detekt:detekt-formatting:1.23.1")
+    detektPlugins(libs.detekt.formatting)
 }
