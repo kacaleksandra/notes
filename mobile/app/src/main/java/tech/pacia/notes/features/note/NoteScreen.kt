@@ -26,7 +26,8 @@ import tech.pacia.notes.ui.theme.NotesTheme
 @Composable
 fun NoteScreen(
     modifier: Modifier = Modifier,
-    title: String,
+    title: String = "",
+    content: String = "",
     onNavigateUp: () -> Unit = {},
     onNoteEdited: (String) -> Unit = {},
 ) {
@@ -60,7 +61,7 @@ fun NoteScreen(
 
             TextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = "xd",
+                value = content,
                 onValueChange = onNoteEdited,
             )
         }

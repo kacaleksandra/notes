@@ -1,5 +1,3 @@
-import io.gitlab.arturbosch.detekt.Detekt
-
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
@@ -41,6 +39,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "11"
+        suppressWarnings = true
     }
 
     buildFeatures {
@@ -57,7 +56,7 @@ android {
         }
     }
 
-    tasks.withType<Detekt> {
+    detekt {
         config.setFrom(file("../detekt.yaml"))
         buildUponDefaultConfig = true
         autoCorrect = true
@@ -82,7 +81,5 @@ dependencies {
     androidTestImplementation(libs.ui.test.junit4)
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
-    // lintChecks("com.slack.lint.compose:compose-lint-checks:1.2.0")
-    // detektPlugins(libs. "io.gitlab.arturbosch.detekt:detekt-formatting:1.23.1")
     detektPlugins(libs.detekt.formatting)
 }
