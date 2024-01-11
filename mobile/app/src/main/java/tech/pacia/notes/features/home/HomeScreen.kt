@@ -2,13 +2,18 @@ package tech.pacia.notes.features.home
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.util.Log
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -46,7 +51,10 @@ fun HomeScreen(
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    categories: Set<String> = setOf(),
+    selectedCategories: Set<String> = setOf(),
     notes: List<Note> = listOf(),
+    onCategoryClick: (category: String) -> Unit = {},
     onNavigateToNote: (noteId: String) -> Unit = {},
     onDeleteNote: (noteId: String) -> Unit = {},
 ) {
@@ -58,28 +66,45 @@ fun HomeScreen(
             )
         },
     ) { paddingValues ->
-        LazyVerticalStaggeredGrid(
+        Column(
             modifier = Modifier.padding(paddingValues),
-            columns = StaggeredGridCells.Fixed(2),
-            verticalItemSpacing = 8.dp,
-            contentPadding = PaddingValues(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            items(
-                items = notes,
-                key = { note -> note.id },
-                itemContent = { note ->
-                    NoteCard(
-                        title = note.title,
-                        content = note.content,
-                        onClick = { onNavigateToNote(note.id) },
-                        onLongClick = {
-                            Log.d("XDDD lol", "Deleting note with id ${note.id}")
-                            onDeleteNote(note.id)
-                        },
+            Row(
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                for (category in categories) {
+                    FilterChip(
+                        selected = selectedCategories.contains(category),
+                        onClick = { onCategoryClick(category) },
+                        label = { Text(category) },
                     )
-                },
-            )
+                }
+            }
+
+            LazyVerticalStaggeredGrid(
+                columns = StaggeredGridCells.Fixed(2),
+                verticalItemSpacing = 8.dp,
+                contentPadding = PaddingValues(start = 8.dp, end = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                items(
+                    items = notes,
+                    key = { note -> note.id },
+                    itemContent = { note ->
+                        NoteCard(
+                            note = note,
+                            onClick = { onNavigateToNote(note.id) },
+                            onLongClick = {
+                                Log.d("XDDD lol", "Deleting note with id ${note.id}")
+                                onDeleteNote(note.id)
+                            },
+                        )
+                    },
+                )
+            }
         }
     }
 }
@@ -90,6 +115,8 @@ fun HomeScreenPreview() {
     NotesTheme {
         HomeScreen(
             notes = NotesRepository.notes,
+            categories = setOf("All") + NotesRepository.categories,
+            selectedCategories = setOf("All"),
         )
     }
 }
@@ -100,6 +127,8 @@ fun HomeScreenPreviewDark() {
     NotesTheme {
         HomeScreen(
             notes = NotesRepository.notes,
+            categories = setOf("All") + NotesRepository.categories,
+            selectedCategories = setOf("Shopping"),
         )
     }
 }

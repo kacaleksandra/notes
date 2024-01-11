@@ -1,6 +1,8 @@
 complexity:
   LongMethod:
     active: false
+  LongParameterList:
+    active: false
 
 formatting:
   TrailingCommaOnCallSite:
