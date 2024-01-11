@@ -4,7 +4,8 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  app.enableCors(); //public api, we open for everyone
+  app.setGlobalPrefix('api');
   const config = new DocumentBuilder()
     .setTitle('Notes app')
     .setDescription('The notes API description')
