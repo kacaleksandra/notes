@@ -11,14 +11,21 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,12 +44,15 @@ fun NoteCard(
     modifier: Modifier = Modifier,
     note: Note,
     onClick: () -> Unit = {},
-    onLongClick: () -> Unit = {},
+    // onLongClick: () -> Unit = {},
+    onDelete: () -> Unit = {},
 ) {
+    val expanded = remember { mutableStateOf(false) }
+
     Card(
         modifier = modifier.combinedClickable(
             onClick = onClick,
-            onLongClick = onLongClick,
+            onLongClick = { expanded.value = true },
         ),
         shape = RoundedCornerShape(8.dp),
     ) {
@@ -71,7 +81,6 @@ fun NoteCard(
                 for (category in note.categories) {
                     CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
                         FilterChip(
-                            // modifier = Modifier.padding(8.dp),
                             selected = true,
                             onClick = { },
                             label = { Text(category) },
@@ -79,6 +88,22 @@ fun NoteCard(
                     }
                 }
             }
+        }
+
+        DropdownMenu(
+            expanded = expanded.value,
+            onDismissRequest = { expanded.value = false },
+        ) {
+            DropdownMenuItem(
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Rounded.Delete,
+                        contentDescription = "Delete note - trach icon",
+                    )
+                },
+                text = { Text("Delete note") },
+                onClick = onDelete,
+            )
         }
     }
 }

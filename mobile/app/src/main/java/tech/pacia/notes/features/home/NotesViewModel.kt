@@ -13,6 +13,8 @@ import tech.pacia.notes.data.NotesRepository
 
 class NotesViewModel(private val notesRepository: NotesRepository) : ViewModel() {
     private val _notes: MutableState<List<Note>> = mutableStateOf(value = emptyList())
+    private val _categories: MutableState<Set<String>> = mutableStateOf(value = emptySet())
+    private val _selectedCategories: MutableState<Set<String>> = mutableStateOf(value = emptySet())
 
     init {
         refresh()
@@ -21,8 +23,19 @@ class NotesViewModel(private val notesRepository: NotesRepository) : ViewModel()
     val notes: State<List<Note>>
         get() = _notes
 
+    val categories: State<Set<String>>
+        get() = _categories
+
+    val selectedCategories: State<Set<String>>
+        get() = _selectedCategories
+
+    fun setSelectedCategories(categories: Set<String>) {
+        _selectedCategories.value = categories
+    }
+
     fun refresh() {
         viewModelScope.launch {
+            _categories.value = notesRepository.loadCategories()
             _notes.value = notesRepository.loadNotes()
         }
     }

@@ -12,6 +12,9 @@ data class Note(
 )
 
 class NotesRepository {
+    suspend fun loadCategories(): Set<String> {
+        return categories
+    }
     suspend fun loadNotes(): List<Note> {
         return notes
     }
@@ -70,14 +73,14 @@ class NotesRepository {
             Note(
                 id = "6",
                 title = "Innovative Idea",
-                content = "Develop a sustainable energy solution.",
+                content = "Develop a sustainable energy solution. No more coal mines, hell yeah.",
                 categories = setOf("Ideas"),
                 createdAt = LocalDateTime.parse("2024-01-25T09:30"),
             ),
             Note(
                 id = "7",
                 title = "What if...?",
-                content = "If a cow had wings then it could fly.",
+                content = "If a cow had wings then it could fly. Whoaah, it'd be awesome! Realllly!",
                 categories = setOf("Ideas", "Stupid & Crazy"),
                 createdAt = LocalDateTime.parse("2024-01-25T21:37"),
             ),

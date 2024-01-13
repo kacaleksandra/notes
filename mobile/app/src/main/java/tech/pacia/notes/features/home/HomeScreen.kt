@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
@@ -39,8 +41,11 @@ fun HomeScreen(
         },
     ),
 ) {
+    // TODO: Observe as state?
     HomeScreen(
         modifier = modifier,
+        categories = notesViewModel.categories.value,
+        selectedCategories = notesViewModel.selectedCategories.value,
         notes = notesViewModel.notes.value,
         onNavigateToNote = onNavigateToNote,
         onDeleteNote = notesViewModel::deleteNote,
@@ -71,10 +76,11 @@ fun HomeScreen(
         ) {
             Row(
                 modifier = Modifier
-                    .padding(start = 8.dp)
+                    // .padding(start = 8.dp)
                     .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
+                Spacer(modifier = Modifier)
                 for (category in categories) {
                     FilterChip(
                         selected = selectedCategories.contains(category),
@@ -82,6 +88,7 @@ fun HomeScreen(
                         label = { Text(category) },
                     )
                 }
+                Spacer(modifier = Modifier)
             }
 
             LazyVerticalStaggeredGrid(
@@ -97,7 +104,7 @@ fun HomeScreen(
                         NoteCard(
                             note = note,
                             onClick = { onNavigateToNote(note.id) },
-                            onLongClick = {
+                            onDelete = {
                                 Log.d("XDDD lol", "Deleting note with id ${note.id}")
                                 onDeleteNote(note.id)
                             },
