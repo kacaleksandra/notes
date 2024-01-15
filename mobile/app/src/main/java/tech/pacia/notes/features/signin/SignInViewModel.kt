@@ -18,7 +18,7 @@ sealed interface SignInState {
 }
 
 class SignInViewModel(
-    private val authRepository: AuthRepository = AuthRepository
+    private val authRepository: AuthRepository = AuthRepository,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<SignInState> = MutableStateFlow(SignInState.Neutral)
     val uiState: StateFlow<SignInState> = _uiState

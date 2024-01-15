@@ -29,7 +29,7 @@ fun SignInRoute(onNavigateToHome: () -> Unit = {}) {
     SignInScreen(
         onDismissError = signInViewModel::dismissError,
         onSignInSubmitted = signInViewModel::signIn,
-        signInState = signInState
+        signInState = signInState,
     )
 }
 

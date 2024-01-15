@@ -1,6 +1,5 @@
 package tech.pacia.notes.data
 
-import kotlinx.coroutines.flow.StateFlow
 import retrofit2.HttpException
 import retrofit2.Response
 

@@ -50,7 +50,6 @@ fun HomeScreen(
                         onClick = {
                             Log.d("XDDXDXD", "signo uttt")
                             onSignOut()
-
                         },
                     ) {
                         Icon(
@@ -80,11 +79,8 @@ fun HomeScreen(
                             .horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-
                         Spacer(modifier = Modifier)
                         for (category in notesUiState.categories) {
-
-
                             FilterChip(
                                 selected = notesUiState.categories.contains(category),
                                 onClick = { onCategoryClick(category) },
@@ -144,7 +140,7 @@ fun HomeScreenPreviewDark() {
                 notes = NotesRepository.notes,
                 categories = setOf("All") + NotesRepository.categories,
                 selectedCategories = setOf("Shopping"),
-            )
+            ),
         )
     }
 }

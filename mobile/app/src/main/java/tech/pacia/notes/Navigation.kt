@@ -41,7 +41,7 @@ fun NotesNavHost(navController: NavHostController = rememberNavController()) {
                             inclusive = true
                         }
                     }
-                }
+                },
             )
         }
         composable(Destinations.NOTE_ROUTE) {
