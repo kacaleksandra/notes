@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 android {
@@ -71,7 +72,8 @@ detekt {
 
 dependencies {
     implementation(libs.core.ktx)
-    implementation(libs.lifecycle.runtime.ktx)
+    // implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.activity.compose)
     implementation(platform(libs.compose.bom))
@@ -81,6 +83,8 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.datetime)
+
+    implementation(libs.bundles.retrofit)
 
     testImplementation(libs.junit)
 

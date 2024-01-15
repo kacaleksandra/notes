@@ -2,48 +2,46 @@ package tech.pacia.notes.features.signin
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.seconds
+import tech.pacia.notes.data.AuthRepository
+import tech.pacia.notes.data.Error
+import tech.pacia.notes.data.Exception
+import tech.pacia.notes.data.Success
 
-class SignInViewModel : ViewModel() {
-    private val _inProgress = MutableStateFlow(false)
-    val inProgress: StateFlow<Boolean> = _inProgress
+sealed interface SignInState {
+    data object Neutral : SignInState
+    data object Loading : SignInState
+    data class Error(val message: String) : SignInState
+    data object Success : SignInState
+}
 
-    private val _hasError = MutableStateFlow(false)
-    val hasError: StateFlow<Boolean> = _hasError
+class SignInViewModel(
+    private val authRepository: AuthRepository = AuthRepository
+) : ViewModel() {
+    private val _uiState: MutableStateFlow<SignInState> = MutableStateFlow(SignInState.Neutral)
+    val uiState: StateFlow<SignInState> = _uiState
 
-    fun signIn(
-        username: String,
-        password: String,
-        onSignInComplete: () -> Unit,
-    ) {
+    fun signIn(email: String, password: String) {
         viewModelScope.launch {
-            _inProgress.value = true
-            _hasError.value = false
+            _uiState.value = SignInState.Loading
 
-            delay(1.seconds) // userRepository.signIn(username, password)
-
-            if (username.isBlank() || password.isBlank()) {
-                _inProgress.value = false
-                _hasError.value = true
+            if (email.isBlank() || password.isBlank()) {
+                _uiState.value = SignInState.Error("Email and password fields must not be empty")
                 return@launch
             }
 
-            if (username != "bartek" || password != "123") {
-                _inProgress.value = false
-                _hasError.value = true
-                return@launch
+            val result = authRepository.signIn(email, password)
+            when (result) {
+                is Exception -> _uiState.value = SignInState.Error("Fatal error while signing in")
+                is Error -> _uiState.value = SignInState.Error(result.message ?: "Sign in failed")
+                is Success -> _uiState.value = SignInState.Success
             }
-
-            _inProgress.value = false
-            onSignInComplete()
         }
     }
 
     fun dismissError() {
-        _hasError.value = false
+        _uiState.value = SignInState.Neutral
     }
 }

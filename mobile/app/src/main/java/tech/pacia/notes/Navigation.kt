@@ -23,14 +23,25 @@ fun NotesNavHost(navController: NavHostController = rememberNavController()) {
     ) {
         composable(Destinations.SIGN_IN_ROUTE) {
             SignInRoute(
-                onNavigateToHome = { navController.navigate(Destinations.HOME_ROUTE) },
+                onNavigateToHome = {
+                    navController.navigate(Destinations.HOME_ROUTE) {
+                        popUpTo(Destinations.SIGN_IN_ROUTE) {
+                            inclusive = true
+                        }
+                    }
+                },
             )
         }
         composable(Destinations.HOME_ROUTE) {
             HomeRoute(
-                onNavigateToNote = { noteId ->
-                    navController.navigate("note/$noteId")
-                },
+                onNavigateToNote = { noteId -> navController.navigate("note/$noteId") },
+                onSignOut = {
+                    navController.navigate(Destinations.SIGN_IN_ROUTE) {
+                        popUpTo(Destinations.HOME_ROUTE) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
         }
         composable(Destinations.NOTE_ROUTE) {

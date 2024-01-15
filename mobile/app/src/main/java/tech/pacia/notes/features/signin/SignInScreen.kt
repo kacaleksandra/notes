@@ -53,10 +53,9 @@ import tech.pacia.notes.ui.theme.NotesTheme
 @Composable
 fun SignInScreen(
     modifier: Modifier = Modifier,
-    inProgress: Boolean = false,
-    hasError: Boolean = false,
     onDismissError: () -> Unit = {},
     onSignInSubmitted: (email: String, password: String) -> Unit = { _, _ -> },
+    signInState: SignInState = SignInState.Loading,
 ) {
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -65,18 +64,15 @@ fun SignInScreen(
     val localFocusManager = LocalFocusManager.current
 
     Scaffold(
-        modifier =
-        modifier
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onTap = { localFocusManager.clearFocus() },
-                )
-            },
+        modifier = modifier.pointerInput(Unit) {
+            detectTapGestures(
+                onTap = { localFocusManager.clearFocus() },
+            )
+        },
         topBar = { TopAppBar(title = { Text("Sign in to Notes") }) },
     ) { padding ->
         Column(
-            modifier =
-            Modifier
+            modifier = Modifier
                 .padding(padding)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -114,7 +110,6 @@ fun SignInScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Lock,
-                            // imageVector = if (showPassword) Icons.Default.Visibility else Icons.Default.Lock,
                             contentDescription = if (showPassword) "Hide password" else "Show password",
                         )
                     }
@@ -123,70 +118,69 @@ fun SignInScreen(
 
             Button(
                 onClick = { onSignInSubmitted(username, password) },
-                modifier =
-                Modifier
+                modifier = Modifier
                     .fillMaxWidth(fraction = 0.75f)
                     .padding(8.dp),
             ) {
                 Text("Sign in")
             }
 
-            Button(
-                onClick = { onSignInSubmitted("bartek", "123") },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                modifier =
-                Modifier
-                    .fillMaxWidth(fraction = 0.75f)
-                    .padding(8.dp),
-            ) {
-                Text("Sign in (debug)")
-            }
+//            Button(
+//                onClick = { onSignInSubmitted("bartek", "123") },
+//                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+//                modifier = Modifier
+//                    .fillMaxWidth(fraction = 0.75f)
+//                    .padding(8.dp),
+//            ) {
+//                Text("Sign in (debug)")
+//            }
         }
     }
 
-    if (inProgress) {
-        Box(
-            modifier =
-            Modifier
-                .fillMaxSize()
-                .background(color = Color.Transparent)
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }, // This is mandatory
-                    onClick = { /* block interactions with other UI */ },
-                ),
-        ) {
-            Column(
-                modifier = Modifier.align(Alignment.Center),
-                horizontalAlignment = Alignment.CenterHorizontally,
+    when (signInState) {
+        is SignInState.Loading -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = Color.Transparent)
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }, // This is mandatory
+                        onClick = { /* block interactions with other UI */ },
+                    ),
             ) {
-                Text(
-                    text = "Signing in...",
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                LinearProgressIndicator()
-            }
-        }
-    }
-
-    if (hasError) {
-        AlertDialog(
-            icon = {
-                Icon(Icons.Rounded.Warning, contentDescription = "Example Icon")
-            },
-            title = { Text(text = "dialogTitle") },
-            text = { Text(text = "dialogText") },
-            onDismissRequest = onDismissError,
-            confirmButton = {
-                TextButton(
-                    onClick = onDismissError,
+                Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Text("Try again")
+                    Text(
+                        text = "Signing in...",
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    LinearProgressIndicator()
                 }
-            },
-        )
+            }
+        }
+
+        is SignInState.Error -> {
+            AlertDialog(
+                icon = { Icon(Icons.Rounded.Warning, contentDescription = "Warning icon") },
+                title = { Text(text = signInState.message) },
+                text = { Text(text = "Failed to sign in") },
+                onDismissRequest = onDismissError,
+                confirmButton = {
+                    TextButton(
+                        onClick = onDismissError,
+                    ) {
+                        Text("Try again")
+                    }
+                },
+            )
+        }
+
+        else -> Unit
     }
 }
 
@@ -202,6 +196,6 @@ fun SignInScreenPreview() {
 @Composable
 fun SignInScreenInProgressPreview() {
     NotesTheme {
-        SignInScreen(inProgress = true)
+        SignInScreen()
     }
 }

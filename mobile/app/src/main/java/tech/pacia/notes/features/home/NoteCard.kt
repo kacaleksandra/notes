@@ -44,7 +44,6 @@ fun NoteCard(
     modifier: Modifier = Modifier,
     note: Note,
     onClick: () -> Unit = {},
-    // onLongClick: () -> Unit = {},
     onDelete: () -> Unit = {},
 ) {
     val expanded = remember { mutableStateOf(false) }

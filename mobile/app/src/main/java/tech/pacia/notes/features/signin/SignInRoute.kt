@@ -1,9 +1,12 @@
 package tech.pacia.notes.features.signin
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import tech.pacia.notes.ui.theme.NotesTheme
 
@@ -11,16 +14,22 @@ import tech.pacia.notes.ui.theme.NotesTheme
 fun SignInRoute(onNavigateToHome: () -> Unit = {}) {
     val signInViewModel: SignInViewModel = viewModel(modelClass = SignInViewModel::class.java)
 
-    val inProgress = signInViewModel.inProgress.collectAsState().value
-    val hasError = signInViewModel.hasError.collectAsState().value
+    val signInState by signInViewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(signInState) {
+        Log.d("XDXD", "signInState changed")
+        if (signInState is SignInState.Success) {
+            onNavigateToHome()
+        }
+    }
+
+//    val inProgress = signInViewModel.inProgress.collectAsState().value
+//    val hasError = signInViewModel.hasError.collectAsState().value
 
     SignInScreen(
-        inProgress = inProgress,
-        hasError = hasError,
-        onDismissError = { signInViewModel.dismissError() },
-        onSignInSubmitted = { username, password ->
-            signInViewModel.signIn(username, password, onNavigateToHome)
-        },
+        onDismissError = signInViewModel::dismissError,
+        onSignInSubmitted = signInViewModel::signIn,
+        signInState = signInState
     )
 }
 

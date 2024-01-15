@@ -9,13 +9,17 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -23,94 +27,95 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.MutableCreationExtras
-import androidx.lifecycle.viewmodel.compose.viewModel
-import tech.pacia.notes.data.Note
 import tech.pacia.notes.data.NotesRepository
 import tech.pacia.notes.ui.theme.NotesTheme
-
-@Composable
-fun HomeScreen(
-    modifier: Modifier = Modifier,
-    onNavigateToNote: (noteId: String) -> Unit = {},
-    notesViewModel: NotesViewModel = viewModel(
-        factory = NotesViewModel.Factory,
-        extras = MutableCreationExtras().apply {
-            // TODO: Ugly hack to work around the lack of proper DI
-            set(NotesRepository.VM_KEY, NotesRepository())
-        },
-    ),
-) {
-    // TODO: Observe as state?
-    HomeScreen(
-        modifier = modifier,
-        categories = notesViewModel.categories.value,
-        selectedCategories = notesViewModel.selectedCategories.value,
-        notes = notesViewModel.notes.value,
-        onNavigateToNote = onNavigateToNote,
-        onDeleteNote = notesViewModel::deleteNote,
-    )
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    categories: Set<String> = setOf(),
-    selectedCategories: Set<String> = setOf(),
-    notes: List<Note> = listOf(),
+    notesUiState: NotesState,
     onCategoryClick: (category: String) -> Unit = {},
     onNavigateToNote: (noteId: String) -> Unit = {},
     onDeleteNote: (noteId: String) -> Unit = {},
+    onSignOut: () -> Unit = {},
 ) {
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
                 title = { Text("My notes super app") },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            Log.d("XDDXDXD", "signo uttt")
+                            onSignOut()
+
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Sign out",
+                        )
+                    }
+                },
             )
         },
     ) { paddingValues ->
         Column(
             modifier = Modifier.padding(paddingValues),
         ) {
-            Row(
-                modifier = Modifier
-                    // .padding(start = 8.dp)
-                    .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Spacer(modifier = Modifier)
-                for (category in categories) {
-                    FilterChip(
-                        selected = selectedCategories.contains(category),
-                        onClick = { onCategoryClick(category) },
-                        label = { Text(category) },
-                    )
+            when (notesUiState) {
+                is NotesState.Loading -> {
+                    CircularProgressIndicator()
                 }
-                Spacer(modifier = Modifier)
-            }
 
-            LazyVerticalStaggeredGrid(
-                columns = StaggeredGridCells.Fixed(2),
-                verticalItemSpacing = 8.dp,
-                contentPadding = PaddingValues(start = 8.dp, end = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                items(
-                    items = notes,
-                    key = { note -> note.id },
-                    itemContent = { note ->
-                        NoteCard(
-                            note = note,
-                            onClick = { onNavigateToNote(note.id) },
-                            onDelete = {
-                                Log.d("XDDD lol", "Deleting note with id ${note.id}")
-                                onDeleteNote(note.id)
+                is NotesState.Error -> {
+                    Text(notesUiState.message)
+                }
+
+                is NotesState.Success -> {
+                    Row(
+                        modifier = Modifier
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+
+                        Spacer(modifier = Modifier)
+                        for (category in notesUiState.categories) {
+
+
+                            FilterChip(
+                                selected = notesUiState.categories.contains(category),
+                                onClick = { onCategoryClick(category) },
+                                label = { Text(category) },
+                            )
+                        }
+                        Spacer(modifier = Modifier)
+                    }
+
+                    LazyVerticalStaggeredGrid(
+                        columns = StaggeredGridCells.Fixed(2),
+                        verticalItemSpacing = 8.dp,
+                        contentPadding = PaddingValues(start = 8.dp, end = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        items(
+                            items = notesUiState.notes,
+                            key = { note -> note.id },
+                            itemContent = { note ->
+                                NoteCard(
+                                    note = note,
+                                    onClick = { onNavigateToNote(note.id) },
+                                    onDelete = {
+                                        Log.d("XDDD lol", "Deleting note with id ${note.id}")
+                                        onDeleteNote(note.id)
+                                    },
+                                )
                             },
                         )
-                    },
-                )
+                    }
+                }
             }
         }
     }
@@ -121,9 +126,11 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     NotesTheme {
         HomeScreen(
-            notes = NotesRepository.notes,
-            categories = setOf("All") + NotesRepository.categories,
-            selectedCategories = setOf("All"),
+            notesUiState = NotesState.Success(
+                notes = NotesRepository.notes,
+                categories = setOf("All") + NotesRepository.categories,
+                selectedCategories = setOf("All"),
+            ),
         )
     }
 }
@@ -133,9 +140,11 @@ fun HomeScreenPreview() {
 fun HomeScreenPreviewDark() {
     NotesTheme {
         HomeScreen(
-            notes = NotesRepository.notes,
-            categories = setOf("All") + NotesRepository.categories,
-            selectedCategories = setOf("Shopping"),
+            notesUiState = NotesState.Success(
+                notes = NotesRepository.notes,
+                categories = setOf("All") + NotesRepository.categories,
+                selectedCategories = setOf("Shopping"),
+            )
         )
     }
 }
