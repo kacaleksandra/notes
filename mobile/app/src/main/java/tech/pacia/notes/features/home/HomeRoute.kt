@@ -15,7 +15,7 @@ fun HomeRoute(
 
     HomeScreen(
         notesUiState = notesUiState,
-        onCategoryClick = { /*TODO*/ },
+        onCategoryClick = notesViewModel::toggleCategorySelected,
         onNavigateToNote = onNavigateToNote,
         onDeleteNote = notesViewModel::deleteNote,
         onSignOut = onSignOut,

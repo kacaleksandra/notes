@@ -46,12 +46,7 @@ fun HomeScreen(
             TopAppBar(
                 title = { Text("My notes super app") },
                 actions = {
-                    IconButton(
-                        onClick = {
-                            Log.d("XDDXDXD", "signo uttt")
-                            onSignOut()
-                        },
-                    ) {
+                    IconButton(onClick = onSignOut) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Sign out",
@@ -75,14 +70,13 @@ fun HomeScreen(
 
                 is NotesState.Success -> {
                     Row(
-                        modifier = Modifier
-                            .horizontalScroll(rememberScrollState()),
+                        modifier = Modifier.horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Spacer(modifier = Modifier)
                         for (category in notesUiState.categories) {
                             FilterChip(
-                                selected = notesUiState.categories.contains(category),
+                                selected = notesUiState.selectedCategories.contains(category),
                                 onClick = { onCategoryClick(category) },
                                 label = { Text(category) },
                             )
@@ -97,16 +91,17 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         items(
-                            items = notesUiState.notes,
+                            items = notesUiState.notes.filter { note ->
+                                note.categories.any {
+                                    notesUiState.selectedCategories.contains(it)
+                                }
+                            },
                             key = { note -> note.id },
                             itemContent = { note ->
                                 NoteCard(
                                     note = note,
                                     onClick = { onNavigateToNote(note.id) },
-                                    onDelete = {
-                                        Log.d("XDDD lol", "Deleting note with id ${note.id}")
-                                        onDeleteNote(note.id)
-                                    },
+                                    onDelete = { onDeleteNote(note.id) },
                                 )
                             },
                         )
@@ -125,7 +120,7 @@ fun HomeScreenPreview() {
             notesUiState = NotesState.Success(
                 notes = NotesRepository.notes,
                 categories = setOf("All") + NotesRepository.categories,
-                selectedCategories = setOf("All"),
+                selectedCategories = setOf("All", "Shopping"),
             ),
         )
     }

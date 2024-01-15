@@ -1,5 +1,6 @@
 package tech.pacia.notes.features.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -7,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import tech.pacia.notes.data.Note
 import tech.pacia.notes.data.NotesRepository
+import tech.pacia.notes.features.signin.SignInState
 
 sealed interface NotesState {
     data object Loading : NotesState
@@ -45,6 +47,23 @@ class NotesViewModel(private val notesRepository: NotesRepository = NotesReposit
             } catch (exception: Exception) {
                 _uiState.value = NotesState.Error("Failed")
             }
+        }
+    }
+
+    fun toggleCategorySelected(categoryId: String) {
+        val state = _uiState.value
+        if (state !is NotesState.Success) return
+
+        Log.d("XDXD", "Hello there")
+
+        if (state.selectedCategories.contains(categoryId)) {
+            _uiState.value = state.copy(
+                selectedCategories = state.selectedCategories.minusElement(categoryId),
+            )
+        } else {
+            _uiState.value = state.copy(
+                selectedCategories = state.selectedCategories.plusElement(categoryId),
+            )
         }
     }
 
