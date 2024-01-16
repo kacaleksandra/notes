@@ -12,7 +12,10 @@ import tech.pacia.notes.ui.theme.NotesTheme
 
 @Composable
 fun SignInRoute(onNavigateToHome: () -> Unit = {}) {
-    val signInViewModel: SignInViewModel = viewModel(modelClass = SignInViewModel::class.java)
+    val signInViewModel: SignInViewModel = viewModel(
+        modelClass = SignInViewModel::class.java,
+        factory = SignInViewModel.Factory,
+    )
 
     val signInState by signInViewModel.uiState.collectAsStateWithLifecycle()
 

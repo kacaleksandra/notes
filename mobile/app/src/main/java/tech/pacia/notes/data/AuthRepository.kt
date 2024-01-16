@@ -1,5 +1,7 @@
 package tech.pacia.notes.data
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import retrofit2.HttpException
 import retrofit2.Response
 
@@ -7,8 +9,10 @@ data class User(
     val email: String,
 )
 
-object AuthRepository {
-    private val apiClient: NotesApi = NotesApiClient.webservice
+class AuthRepository(
+    private val dataStore: DataStore<Preferences>,
+    private val apiClient: NotesApi,
+) {
 
     // val user: StateFlow<User> listen for accessToken in datastore
 

@@ -1,13 +1,16 @@
 package tech.pacia.notes.features.home
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import tech.pacia.notes.data.Note
 import tech.pacia.notes.data.NotesRepository
+import tech.pacia.notes.globalNotesRepository
 
 sealed interface NotesState {
     data object Loading : NotesState
@@ -31,7 +34,7 @@ sealed interface NotesState {
     }
 }
 
-class NotesViewModel(private val notesRepository: NotesRepository = NotesRepository) : ViewModel() {
+class NotesViewModel(private val notesRepository: NotesRepository) : ViewModel() {
     private val _uiState: MutableStateFlow<NotesState> = MutableStateFlow(NotesState.Loading)
     val uiState: StateFlow<NotesState> = _uiState
 
@@ -82,4 +85,13 @@ class NotesViewModel(private val notesRepository: NotesRepository = NotesReposit
         }
     }
 
+    companion object {
+        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(
+                modelClass: Class<T>,
+                extras: CreationExtras,
+            ): T = NotesViewModel(notesRepository = globalNotesRepository) as T
+        }
+    }
 }

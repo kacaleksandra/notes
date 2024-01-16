@@ -1,7 +1,9 @@
 package tech.pacia.notes.features.signin
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -9,6 +11,7 @@ import tech.pacia.notes.data.AuthRepository
 import tech.pacia.notes.data.Error
 import tech.pacia.notes.data.Exception
 import tech.pacia.notes.data.Success
+import tech.pacia.notes.globalAuthRepository
 
 sealed interface SignInState {
     data object Neutral : SignInState
@@ -17,9 +20,7 @@ sealed interface SignInState {
     data object Success : SignInState
 }
 
-class SignInViewModel(
-    private val authRepository: AuthRepository = AuthRepository,
-) : ViewModel() {
+class SignInViewModel(private val authRepository: AuthRepository) : ViewModel() {
     private val _uiState: MutableStateFlow<SignInState> = MutableStateFlow(SignInState.Neutral)
     val uiState: StateFlow<SignInState> = _uiState
 
@@ -43,5 +44,15 @@ class SignInViewModel(
 
     fun dismissError() {
         _uiState.value = SignInState.Neutral
+    }
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(
+                modelClass: Class<T>,
+                extras: CreationExtras,
+            ): T = SignInViewModel(authRepository = globalAuthRepository) as T
+        }
     }
 }

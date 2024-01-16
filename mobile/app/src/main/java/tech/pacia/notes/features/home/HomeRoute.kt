@@ -10,7 +10,11 @@ fun HomeRoute(
     onNavigateToNote: (noteId: String) -> Unit,
     onSignOut: () -> Unit,
 ) {
-    val notesViewModel = viewModel(modelClass = NotesViewModel::class.java)
+    val notesViewModel = viewModel(
+        modelClass = NotesViewModel::class.java,
+        factory = NotesViewModel.Factory,
+    )
+
     val notesUiState by notesViewModel.uiState.collectAsStateWithLifecycle()
 
     HomeScreen(
