@@ -91,11 +91,7 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         items(
-                            items = notesUiState.notes.filter { note ->
-                                note.categories.any {
-                                    notesUiState.selectedCategories.contains(it)
-                                }
-                            },
+                            items = notesUiState.selectedNotes,
                             key = { note -> note.id },
                             itemContent = { note ->
                                 NoteCard(

@@ -19,7 +19,19 @@ sealed interface NotesState {
         val notes: List<Note>,
         val categories: Set<String>,
         val selectedCategories: Set<String>,
-    ) : NotesState
+    ) : NotesState {
+
+        val selectedNotes: List<Note>
+            get() {
+                if (selectedCategories.contains("All")) return notes
+
+                return notes.filter { note ->
+                    note.categories.any {
+                        selectedCategories.contains(it)
+                    }
+                }
+            }
+    }
 }
 
 class NotesViewModel(private val notesRepository: NotesRepository = NotesRepository) : ViewModel() {
@@ -40,7 +52,7 @@ class NotesViewModel(private val notesRepository: NotesRepository = NotesReposit
 
             try {
                 _uiState.value = NotesState.Success(
-                    categories = notesRepository.loadCategories(),
+                    categories = notesRepository.loadCategories() + setOf("All"),
                     notes = notesRepository.loadNotes(),
                     selectedCategories = selectedCategories,
                 )
@@ -54,23 +66,28 @@ class NotesViewModel(private val notesRepository: NotesRepository = NotesReposit
         val state = _uiState.value
         if (state !is NotesState.Success) return
 
-        Log.d("XDXD", "Hello there")
+        var newState = state.copy()
+        if (categoryId == "All") {
+            if (newState.selectedCategories.contains("All")) {
+                newState = newState.copy(categories = setOf("All"))
+            }
 
-        if (state.selectedCategories.contains(categoryId)) {
-            _uiState.value = state.copy(
-                selectedCategories = state.selectedCategories.minusElement(categoryId),
-            )
-        } else {
-            _uiState.value = state.copy(
-                selectedCategories = state.selectedCategories.plusElement(categoryId),
-            )
+            if (state.selectedCategories.contains(categoryId)) {
+                _uiState.value = state.copy(
+                    selectedCategories = state.selectedCategories.minusElement(categoryId),
+                )
+            } else {
+                _uiState.value = state.copy(
+                    selectedCategories = state.selectedCategories.plusElement(categoryId),
+                )
+            }
         }
-    }
 
-    fun deleteNote(noteId: String) {
-        viewModelScope.launch {
-            notesRepository.deleteNoteById(noteId)
-            refresh()
+        fun deleteNote(noteId: String) {
+            viewModelScope.launch {
+                notesRepository.deleteNoteById(noteId)
+                refresh()
+            }
         }
     }
 }
