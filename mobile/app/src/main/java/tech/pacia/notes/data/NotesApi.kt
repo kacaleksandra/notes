@@ -18,7 +18,10 @@ data class UserRequest(
 )
 
 @Serializable
-data class SignInResponse(val accessToken: String)
+data class SignInResponse(
+    val accessToken: String,
+    val email: String,
+)
 
 interface NotesApi {
     @POST("users")
@@ -31,27 +34,30 @@ interface NotesApi {
     suspend fun createNote(@Body note: Note): Response<Unit>
 }
 
-object NotesApiClient {
-    private const val URL = "http://10.0.2.2:3000/api/"
-
-    // Adding authorization token to every request
+class NotesApiClient(
+    private val url: String,
+    private val tokenStore: TokenStore,
+) {
     private val builder: OkHttpClient.Builder = OkHttpClient.Builder()
         .addInterceptor { chain ->
-            // TODO: Get token from local storage
-            val accessToken = ""
+            val accessToken = tokenStore.accessToken()
+            if (accessToken == null) {
+                Log.d("NotesApiClient", "accessToken is null")
+                chain.proceed(chain.request())
+            }
+            Log.d("NotesApiClient", "AccessToken: $accessToken")
 
             val request = chain.request().newBuilder()
                 .addHeader("Authorization", "Bearer $accessToken")
                 .build()
 
-            Log.d("Token", accessToken)
             chain.proceed(request)
         }
 
     private val httpClient: OkHttpClient = builder.build()
 
     val webservice: NotesApi = Retrofit.Builder()
-        .baseUrl(URL)
+        .baseUrl(url)
         .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
         .client(httpClient)
         .build()

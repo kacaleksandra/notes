@@ -2,19 +2,41 @@ package tech.pacia.notes.data
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import retrofit2.HttpException
 import retrofit2.Response
 
 data class User(
     val email: String,
+    val accessToken: String,
 )
 
 class AuthRepository(
-    private val dataStore: DataStore<Preferences>,
     private val apiClient: NotesApi,
+    private val tokenStore: TokenStore,
 ) {
 
-    // val user: StateFlow<User> listen for accessToken in datastore
+    /*fun accessToken(): String? {
+        return runBlocking { dataStore.data.first()[PreferencesKeys.USER_ACCESS_TOKEN] }
+    }
+
+
+    val userFlow: Flow<User?> = dataStore.data.map { preferences ->
+        val accessToken = preferences[PreferencesKeys.USER_ACCESS_TOKEN]
+        val email = preferences[PreferencesKeys.USER_EMAIL]
+        if (accessToken == null || email == null) {
+            return@map null
+        }
+
+        return@map User(
+            email = email, accessToken = accessToken
+        )
+    }*/
 
     suspend fun signUp(email: String, password: String): NetworkResult<Unit> {
         return callSafely {
@@ -22,11 +44,26 @@ class AuthRepository(
         }
     }
 
+
     suspend fun signIn(email: String, password: String): NetworkResult<SignInResponse> {
-        return callSafely {
+        val result = callSafely {
             apiClient.signIn(UserRequest(email = email, password = password))
         }
+
+        when (result) {
+            is Success -> tokenStore.persistToken(result.data.accessToken)
+            /*dataStore.edit { preferences ->
+                preferences[PreferencesKeys.USER_ACCESS_TOKEN] = result.data.accessToken
+                preferences[PreferencesKeys.USER_EMAIL] = result.data.email
+            }*/
+
+            else -> Unit
+        }
+
+        return result
     }
+
+    suspend fun signOut() = tokenStore.clearToken()
 
     @Suppress("TooGenericExceptionCaught")
     private suspend fun <T : Any> callSafely(apiMethod: suspend () -> Response<T>): NetworkResult<T> {

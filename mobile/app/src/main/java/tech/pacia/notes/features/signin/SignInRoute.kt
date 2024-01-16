@@ -20,14 +20,10 @@ fun SignInRoute(onNavigateToHome: () -> Unit = {}) {
     val signInState by signInViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(signInState) {
-        Log.d("XDXD", "signInState changed")
         if (signInState is SignInState.Success) {
             onNavigateToHome()
         }
     }
-
-//    val inProgress = signInViewModel.inProgress.collectAsState().value
-//    val hasError = signInViewModel.hasError.collectAsState().value
 
     SignInScreen(
         onDismissError = signInViewModel::dismissError,
