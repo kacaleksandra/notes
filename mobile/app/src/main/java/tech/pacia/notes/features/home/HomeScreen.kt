@@ -1,13 +1,14 @@
 package tech.pacia.notes.features.home
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import android.util.Log
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -24,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -57,15 +59,24 @@ fun HomeScreen(
         },
     ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues),
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize(),
         ) {
             when (notesUiState) {
                 is NotesState.Loading -> {
-                    CircularProgressIndicator()
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
                 }
 
                 is NotesState.Error -> {
-                    Text(notesUiState.message)
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Text(
+                            modifier = Modifier.align(Alignment.Center),
+                            text = notesUiState.message,
+                        )
+                    }
                 }
 
                 is NotesState.Success -> {
@@ -84,23 +95,32 @@ fun HomeScreen(
                         Spacer(modifier = Modifier)
                     }
 
-                    LazyVerticalStaggeredGrid(
-                        columns = StaggeredGridCells.Fixed(2),
-                        verticalItemSpacing = 8.dp,
-                        contentPadding = PaddingValues(start = 8.dp, end = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        items(
-                            items = notesUiState.selectedNotes,
-                            key = { note -> note.id },
-                            itemContent = { note ->
-                                NoteCard(
-                                    note = note,
-                                    onClick = { onNavigateToNote(note.id) },
-                                    onDelete = { onDeleteNote(note.id) },
-                                )
-                            },
-                        )
+                    if (notesUiState.selectedNotes.isEmpty()) {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            Text(
+                                modifier = Modifier.align(Alignment.Center),
+                                text = "You don't have any notes",
+                            )
+                        }
+                    } else {
+                        LazyVerticalStaggeredGrid(
+                            columns = StaggeredGridCells.Fixed(2),
+                            verticalItemSpacing = 8.dp,
+                            contentPadding = PaddingValues(start = 8.dp, end = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            items(
+                                items = notesUiState.selectedNotes,
+                                key = { note -> note.id },
+                                itemContent = { note ->
+                                    NoteCard(
+                                        note = note,
+                                        onClick = { onNavigateToNote(note.id) },
+                                        onDelete = { onDeleteNote(note.id) },
+                                    )
+                                },
+                            )
+                        }
                     }
                 }
             }

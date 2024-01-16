@@ -1,14 +1,13 @@
 package tech.pacia.notes.features.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import tech.pacia.notes.data.Note
 import tech.pacia.notes.data.NotesRepository
-import tech.pacia.notes.features.signin.SignInState
 
 sealed interface NotesState {
     data object Loading : NotesState
@@ -23,12 +22,10 @@ sealed interface NotesState {
 
         val selectedNotes: List<Note>
             get() {
-                if (selectedCategories.contains("All")) return notes
+                if (selectedCategories.isEmpty()) return notes
 
                 return notes.filter { note ->
-                    note.categories.any {
-                        selectedCategories.contains(it)
-                    }
+                    note.categories.any { selectedCategories.contains(it) }
                 }
             }
     }
@@ -49,10 +46,11 @@ class NotesViewModel(private val notesRepository: NotesRepository = NotesReposit
                 if (state is NotesState.Success) state.selectedCategories else setOf()
 
             _uiState.value = NotesState.Loading
+            delay(1_000)
 
             try {
                 _uiState.value = NotesState.Success(
-                    categories = notesRepository.loadCategories() + setOf("All"),
+                    categories = notesRepository.loadCategories(),
                     notes = notesRepository.loadNotes(),
                     selectedCategories = selectedCategories,
                 )
@@ -66,28 +64,22 @@ class NotesViewModel(private val notesRepository: NotesRepository = NotesReposit
         val state = _uiState.value
         if (state !is NotesState.Success) return
 
-        var newState = state.copy()
-        if (categoryId == "All") {
-            if (newState.selectedCategories.contains("All")) {
-                newState = newState.copy(categories = setOf("All"))
-            }
-
-            if (state.selectedCategories.contains(categoryId)) {
-                _uiState.value = state.copy(
-                    selectedCategories = state.selectedCategories.minusElement(categoryId),
-                )
-            } else {
-                _uiState.value = state.copy(
-                    selectedCategories = state.selectedCategories.plusElement(categoryId),
-                )
-            }
-        }
-
-        fun deleteNote(noteId: String) {
-            viewModelScope.launch {
-                notesRepository.deleteNoteById(noteId)
-                refresh()
-            }
+        if (state.selectedCategories.contains(categoryId)) {
+            _uiState.value = state.copy(
+                selectedCategories = state.selectedCategories.minusElement(categoryId),
+            )
+        } else {
+            _uiState.value = state.copy(
+                selectedCategories = state.selectedCategories.plusElement(categoryId),
+            )
         }
     }
+
+    fun deleteNote(noteId: String) {
+        viewModelScope.launch {
+            notesRepository.deleteNoteById(noteId)
+            refresh()
+        }
+    }
+
 }
