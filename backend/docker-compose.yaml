@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  notes-app:
+    build: .
+    depends_on:
+      - notes-database
+    ports:
+      - '3000:3000'
+    environment:
+      DATABASE_URL: postgresql://prisma:prisma123@notes-database:5432/notes
+      JWT_SECRET: ${JWT_SECRET}
+
+  notes-database:
+    image: postgres:16
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: prisma
+      POSTGRES_PASSWORD: prisma123
+      POSTGRES_DB: notes
+    ports:
+      - 5432:5432
+
+
+volumes:
+  postgres-data:
