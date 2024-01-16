@@ -1,23 +1,24 @@
-# Use the official Node.js image as the base image
-FROM node:20.10.0
+FROM node:20.10.0 AS builder
 
-# Set the working directory
+# Create app directory
 WORKDIR /app
 
-# Copy files from your computer into the image
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
+COPY package*.json ./
+COPY prisma ./prisma/
+
+# Install app dependencies
+RUN npm install
+
 COPY . .
 
-# Install the dependencies
-RUN npm install
+RUN npm run build
 
-# Copy package.json and package-lock.json to the container
-COPY package*.json ./
+FROM node:20.10.0
 
-# Install application dependencies
-RUN npm install
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/dist ./dist
 
-# Expose the port that your application will run on (Nest.js default is 3000)
 EXPOSE 3000
-
-# Define the command to run your application
-CMD ["npm", "start"]
+CMD [ "npm", "run", "start:prod" ]
