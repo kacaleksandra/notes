@@ -1,7 +1,8 @@
-node_modules
-npm-debug.log
-Dockerfile
-.dockerignore
-.git
-.gitignore
-.env
+.dockerignore   # Ignore the ignore
+node_modules    # Ignore local node_modules folder
+Dockerfile      # The dockerfile
+.git            # The git history
+.gitignore      #
+.npmrc          # If accessing a private npm repository here will be the token used, so ignore to prevent leaking
+.github         # Using github actions ?
+*.md
