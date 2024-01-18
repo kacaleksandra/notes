@@ -86,6 +86,10 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.datetime)
 
+    implementation(libs.room.runtime)
+    implementation(libs.room.compiler)
+    implementation(libs.room.ktx)
+
     implementation(libs.bundles.retrofit)
 
     testImplementation(libs.junit)
