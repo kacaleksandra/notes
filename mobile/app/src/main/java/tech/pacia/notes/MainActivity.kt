@@ -11,10 +11,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.room.Room
 import tech.pacia.notes.data.AuthRepository
 import tech.pacia.notes.data.NotesApiClient
 import tech.pacia.notes.data.NotesRepository
 import tech.pacia.notes.data.TokenStore
+import tech.pacia.notes.data.local.AppDatabase
 import tech.pacia.notes.ui.theme.NotesTheme
 
 private const val PREFERENCES_NAME = "preferences"
@@ -47,7 +49,15 @@ class MainActivity : ComponentActivity() {
             tokenStore = globalTokenStore,
         )
 
-        globalNotesRepository = NotesRepository()
+        val db = Room.databaseBuilder(
+            context = applicationContext,
+            klass = AppDatabase::class.java,
+            name = "notes-db",
+        ).build()
+
+        globalNotesRepository = NotesRepository(
+            noteDao = db.notesDao(),
+        )
 
         setContent {
             NotesTheme {

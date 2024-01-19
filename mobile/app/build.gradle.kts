@@ -87,7 +87,7 @@ dependencies {
     implementation(libs.kotlinx.datetime)
 
     implementation(libs.room.runtime)
-    implementation(libs.room.compiler)
+    annotationProcessor(libs.room.compiler)
     implementation(libs.room.ktx)
 
     implementation(libs.bundles.retrofit)

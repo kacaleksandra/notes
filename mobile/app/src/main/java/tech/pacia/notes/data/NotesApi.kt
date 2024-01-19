@@ -10,6 +10,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.http.Body
 import retrofit2.http.POST
+import tech.pacia.notes.data.local.Note
 
 @Serializable
 data class UserRequest(

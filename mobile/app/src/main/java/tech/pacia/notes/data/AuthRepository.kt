@@ -43,11 +43,6 @@ class AuthRepository(
 
         when (result) {
             is Success -> tokenStore.persistToken(result.data.accessToken)
-            /*dataStore.edit { preferences ->
-                preferences[PreferencesKeys.USER_ACCESS_TOKEN] = result.data.accessToken
-                preferences[PreferencesKeys.USER_EMAIL] = result.data.email
-            }*/
-
             else -> Unit
         }
 

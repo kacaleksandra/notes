@@ -8,8 +8,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import tech.pacia.notes.data.Note
 import tech.pacia.notes.data.NotesRepository
+import tech.pacia.notes.data.local.Note
 import tech.pacia.notes.globalNotesRepository
 
 sealed interface NotesState {

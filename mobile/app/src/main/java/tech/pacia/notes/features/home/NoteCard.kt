@@ -30,8 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import tech.pacia.notes.data.Note
 import tech.pacia.notes.data.NotesRepository
+import tech.pacia.notes.data.local.Note
 import tech.pacia.notes.ui.theme.NotesTheme
 
 @OptIn(

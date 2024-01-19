@@ -1,22 +1,30 @@
 package tech.pacia.notes.data
 
 import kotlinx.datetime.LocalDateTime
+import tech.pacia.notes.data.local.Note
+import tech.pacia.notes.data.local.NotesDao
 
-data class Note(
+/*data class Note(
     val id: String,
     val title: String,
     val content: String,
     val categories: Set<String>,
     val createdAt: LocalDateTime, // TODO: Respect timezones
-)
+)*/
 
-class NotesRepository {
-    suspend fun loadCategories(): Set<String> {
+class NotesRepository(
+    private val noteDao: NotesDao,
+) {
+    fun loadCategories(): Set<String> {
         return categories
     }
 
     suspend fun loadNotes(): List<Note> {
-        return notes
+        return noteDao.getNotes()
+    }
+
+    suspend fun deleteNote(note: Note) {
+        noteDao.deleteNotes(listOf(note.id))
     }
 
     suspend fun deleteNoteById(noteId: String) {
@@ -26,6 +34,10 @@ class NotesRepository {
                 break
             }
         }
+    }
+
+    suspend fun upsertNote(note: Note) {
+        noteDao.upsertNote(note)
     }
 
     companion object {
