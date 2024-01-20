@@ -1,33 +1,21 @@
-FROM node:20.10.0 AS build
+FROM node:20.10.0 AS builder
 
 WORKDIR /app
 
 COPY package.json package-lock.json ./
+COPY prisma ./prisma/
 
 RUN npm install
 
 COPY . .
 
-RUN npx prisma generate
-
 RUN npm run build
 
-FROM node:20-slim AS runtime
+FROM node:20.10.0 AS runtime
 
-RUN apt update && apt install libssl-dev dumb-init -y --no-install-recommends
-
-WORKDIR /app
-
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/.env .env
-COPY --from=build /app/package.json .
-COPY --from=build /app/package-lock.json .
-
-RUN npm install --omit=dev
-
-COPY --from=build /app/node_modules/.prisma/client ./node_modules/.prisma/client
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/dist ./dist
 
 EXPOSE 3000
-
-CMD ["dumb-init", "node", "dist/main.js"]
-
+CMD [  "npm", "run", "start:migrate:prod" ]
