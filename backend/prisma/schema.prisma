@@ -16,4 +16,23 @@ model Users {
   id       Int    @id @default(autoincrement())
   email    String @unique
   password String
+  notes    Note[] // Relacja jeden-do-wielu z notatkami użytkownika
+}
+
+model Categories {
+  id    Int    @id @default(autoincrement())
+  title String
+  notes Note[] // Relacja jeden-do-wielu z notatkami w danej kategorii
+}
+
+// prisma/schema.prisma
+model Note {
+  id         Int        @id @default(autoincrement())
+  title      String
+  content    String
+  created_at DateTime
+  userId     Int
+  categoryId Int
+  user       Users      @relation(fields: [userId], references: [id])
+  category   Categories @relation(fields: [categoryId], references: [id])
 }

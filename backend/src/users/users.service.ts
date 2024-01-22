@@ -18,9 +18,14 @@ export class UsersService {
 
     createUserDto.password = hashedPassword;
 
-    return this.prisma.users.create({
+    const createdUser = await this.prisma.users.create({
       data: createUserDto,
     });
+
+    // Usunięcie pola `password` przed zwróceniem obiektu
+    const { password, ...userWithoutPassword } = createdUser;
+
+    return userWithoutPassword;
   }
 
   findAll() {
