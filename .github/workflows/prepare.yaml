@@ -3,10 +3,9 @@ name: prepare
 on:
   workflow_dispatch:
   pull_request:
-  push:
 
 jobs:
-  main:
+  main-mobile:
     runs-on: ubuntu-latest
 
     defaults:
@@ -28,3 +27,28 @@ jobs:
 
       - name: Run detekt
         run: ./gradlew :app:detekt
+
+  main-backend:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        name: Set up Node.js
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Build project
+        run: npm run build
