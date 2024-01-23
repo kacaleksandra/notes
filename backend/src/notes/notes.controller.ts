@@ -26,7 +26,6 @@ export class NotesController {
 
   @Post()
   async create(@Body() createNoteDto: CreateNoteDto, @User() user: Users) {
-    console.log('jest');
     return new NoteEntity(
       await this.notesService.create(user.id, createNoteDto),
     );
