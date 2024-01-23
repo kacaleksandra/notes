@@ -26,16 +26,20 @@ export class CategoriesService {
       throw new ConflictException('Category exists');
     }
 
-    const createdCategory = await this.prisma.categories.create({
-      data: { ...createCategoryDto, userId },
-    });
+    try {
+      const createdCategory = await this.prisma.categories.create({
+        data: { ...createCategoryDto, userId },
+      });
 
-    const categoryWithoutUserId = plainToClass(CategoryEntity, {
-      id: createdCategory.id,
-      title: createdCategory.title,
-    });
+      const categoryWithoutUserId = plainToClass(CategoryEntity, {
+        id: createdCategory.id,
+        title: createdCategory.title,
+      });
 
-    return categoryWithoutUserId;
+      return categoryWithoutUserId;
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to create category');
+    }
   }
 
   async remove(userId: number, id: number) {

@@ -29,7 +29,7 @@ model Notes {
   id         Int        @id @default(autoincrement())
   title      String
   content    String
-  created_at DateTime
+  created_at DateTime   @default(now())
   userId     Int
   categoryId Int
   user       Users      @relation(fields: [userId], references: [id])
