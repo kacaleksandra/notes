@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,20 +10,22 @@ datasource db {
 }
 
 model Users {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  password String
-  notes    Note[] // Relacja jeden-do-wielu z notatkami użytkownika
+  id         Int          @id @default(autoincrement())
+  email      String       @unique
+  password   String
+  notes      Notes[]
+  Categories Categories[]
 }
 
 model Categories {
-  id    Int    @id @default(autoincrement())
-  title String
-  notes Note[] // Relacja jeden-do-wielu z notatkami w danej kategorii
+  id     Int     @id @default(autoincrement())
+  title  String
+  userId Int
+  user   Users   @relation(fields: [userId], references: [id])
+  notes  Notes[]
 }
 
-// prisma/schema.prisma
-model Note {
+model Notes {
   id         Int        @id @default(autoincrement())
   title      String
   content    String

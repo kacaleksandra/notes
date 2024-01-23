@@ -3,6 +3,8 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+import { UserEntity } from './entities/user.entity';
+import { plainToClass } from 'class-transformer';
 
 export const roundsOfHashing = 10;
 
@@ -16,10 +18,9 @@ export class UsersService {
     });
 
     if (existingUser) {
-      if (existingUser) {
-        throw new ConflictException('User exists');
-      }
+      throw new ConflictException('User exists');
     }
+
     const hashedPassword = await bcrypt.hash(
       createUserDto.password,
       roundsOfHashing,
@@ -31,8 +32,10 @@ export class UsersService {
       data: createUserDto,
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...userWithoutPassword } = createdUser;
+    const userWithoutPassword = plainToClass(UserEntity, {
+      id: createdUser.id,
+      email: createdUser.email,
+    });
 
     return userWithoutPassword;
   }
