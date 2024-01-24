@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import tech.pacia.notes.data.NotesRepository
 import tech.pacia.notes.ui.theme.NotesTheme
 
+@Suppress("UnusedParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -40,6 +41,7 @@ fun HomeScreen(
     onCategoryClick: (category: String) -> Unit = {},
     onNavigateToNote: (noteId: String) -> Unit = {},
     onDeleteNote: (noteId: String) -> Unit = {},
+    onRefresh: () -> Unit = {},
     onSignOut: () -> Unit = {},
 ) {
     Scaffold(

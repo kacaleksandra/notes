@@ -45,6 +45,7 @@ class HomeViewModel(private val notesRepository: NotesRepository) : ViewModel() 
         refresh()
     }
 
+    @Suppress("SwallowedException", "TooGenericExceptionCaught")
     fun refresh() {
         viewModelScope.launch {
             val state = uiState.value
