@@ -33,7 +33,6 @@ class NotesRepository(private val apiClient: NotesApi) {
     }
 
     companion object {
-
         val categories = mutableSetOf("Journals", "Shopping", "Ideas", "Stupid & Crazy", "Poems")
 
         val notes = mutableListOf(
@@ -86,6 +85,27 @@ class NotesRepository(private val apiClient: NotesApi) {
                 content = "If a cow had wings then it could fly. Whoaah, it'd be awesome! Realllly!",
                 categories = setOf("Ideas", "Stupid & Crazy"),
                 createdAt = LocalDateTime.parse("2024-01-25T21:37"),
+            ),
+            Note(
+                id = "8",
+                title = "Recipe Experiment",
+                content = "Tried a new recipe today. It turned out surprisingly delicious!",
+                categories = setOf("Cooking", "Experiments"),
+                createdAt = LocalDateTime.parse("2024-02-01T19:15"),
+            ),
+            Note(
+                id = "9",
+                title = "Gym Progress",
+                content = "Hit a new personal record at the gym. Feeling strong and accomplished!",
+                categories = setOf("Fitness"),
+                createdAt = LocalDateTime.parse("2024-02-05T07:45"),
+            ),
+            Note(
+                id = "10",
+                title = "Dream Diary",
+                content = "Had a vivid dream last night about flying on a magical carpet. So surreal!",
+                categories = setOf("Dreams"),
+                createdAt = LocalDateTime.parse("2024-02-10T03:20"),
             ),
         )
     }

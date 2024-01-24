@@ -14,8 +14,12 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -32,8 +36,7 @@ import androidx.compose.ui.unit.dp
 import tech.pacia.notes.data.NotesRepository
 import tech.pacia.notes.ui.theme.NotesTheme
 
-@Suppress("UnusedParameter")
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -60,71 +63,88 @@ fun HomeScreen(
             )
         },
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize(),
-        ) {
-            when (notesUiState) {
-                is NotesState.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                    }
+
+        val pullRefreshState = rememberPullRefreshState(
+            refreshing = notesUiState is NotesState.Loading,
+            onRefresh = onRefresh,
+        )
+
+        if (notesUiState is NotesState.Loading) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+
+            return@Scaffold
+        }
+
+        if (notesUiState is NotesState.Error) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Text(
+                    modifier = Modifier.align(Alignment.Center),
+                    text = notesUiState.message,
+                )
+            }
+
+            return@Scaffold
+        }
+
+        if (notesUiState !is NotesState.Success) {
+            return@Scaffold
+        }
+
+        Column(modifier = Modifier.padding(paddingValues)) {
+            Row(
+                modifier = Modifier.horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Spacer(modifier = Modifier)
+                for (category in notesUiState.categories) {
+                    FilterChip(
+                        selected = notesUiState.selectedCategories.contains(category),
+                        onClick = { onCategoryClick(category) },
+                        label = { Text(category) },
+                    )
+                }
+                Spacer(modifier = Modifier)
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pullRefresh(pullRefreshState),
+            ) {
+                if (notesUiState.selectedNotes.isEmpty()) {
+                    Text(
+                        modifier = Modifier.align(Alignment.Center),
+                        text = "You don't have any notes",
+                    )
                 }
 
-                is NotesState.Error -> {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        Text(
-                            modifier = Modifier.align(Alignment.Center),
-                            text = notesUiState.message,
-                        )
-                    }
+                LazyVerticalStaggeredGrid(
+                    columns = StaggeredGridCells.Fixed(2),
+                    verticalItemSpacing = 8.dp,
+                    contentPadding = PaddingValues(start = 8.dp, end = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    items(
+                        items = notesUiState.selectedNotes,
+                        key = { note -> note.id },
+                        itemContent = { note ->
+                            NoteCard(
+                                note = note,
+                                onClick = { onNavigateToNote(note.id) },
+                                onDelete = { onDeleteNote(note.id) },
+                            )
+                        },
+                    )
                 }
 
-                is NotesState.Success -> {
-                    Row(
-                        modifier = Modifier.horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        Spacer(modifier = Modifier)
-                        for (category in notesUiState.categories) {
-                            FilterChip(
-                                selected = notesUiState.selectedCategories.contains(category),
-                                onClick = { onCategoryClick(category) },
-                                label = { Text(category) },
-                            )
-                        }
-                        Spacer(modifier = Modifier)
-                    }
-
-                    if (notesUiState.selectedNotes.isEmpty()) {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            Text(
-                                modifier = Modifier.align(Alignment.Center),
-                                text = "You don't have any notes",
-                            )
-                        }
-                    } else {
-                        LazyVerticalStaggeredGrid(
-                            columns = StaggeredGridCells.Fixed(2),
-                            verticalItemSpacing = 8.dp,
-                            contentPadding = PaddingValues(start = 8.dp, end = 8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            items(
-                                items = notesUiState.selectedNotes,
-                                key = { note -> note.id },
-                                itemContent = { note ->
-                                    NoteCard(
-                                        note = note,
-                                        onClick = { onNavigateToNote(note.id) },
-                                        onDelete = { onDeleteNote(note.id) },
-                                    )
-                                },
-                            )
-                        }
-                    }
-                }
+                PullRefreshIndicator(
+                    refreshing = notesUiState is NotesState.Loading,
+                    state = pullRefreshState,
+                    modifier = Modifier.align(Alignment.TopCenter),
+                    // backgroundColor = if (viewModel.state.value.isLoading) Color.Red else Color.Green,
+                )
             }
         }
     }
@@ -152,7 +172,7 @@ fun HomeScreenPreviewDark() {
             notesUiState = NotesState.Success(
                 notes = NotesRepository.notes,
                 categories = setOf("All") + NotesRepository.categories,
-                selectedCategories = setOf("Shopping"),
+                selectedCategories = setOf(),
             ),
         )
     }
