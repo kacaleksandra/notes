@@ -10,7 +10,7 @@ data class Note(
     val createdAt: LocalDateTime, // TODO: Respect timezones
 )
 
-class NotesRepository {
+class NotesRepository(private val apiClient: NotesApi) {
     suspend fun loadCategories(): Set<String> {
         return categories
     }
@@ -26,6 +26,10 @@ class NotesRepository {
                 break
             }
         }
+    }
+
+    suspend fun createNote(note: Note) {
+        apiClient.createNote(note)
     }
 
     companion object {

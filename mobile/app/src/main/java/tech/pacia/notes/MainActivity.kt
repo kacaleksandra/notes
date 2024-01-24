@@ -27,7 +27,6 @@ lateinit var globalDataStore: DataStore<Preferences>
 lateinit var globalAuthRepository: AuthRepository
 lateinit var globalNotesRepository: NotesRepository
 lateinit var globalTokenStore: TokenStore
-lateinit var globalApiClient: NotesApiClient
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,17 +36,19 @@ class MainActivity : ComponentActivity() {
 
         globalTokenStore = TokenStore(dataStore = globalDataStore)
 
-        globalApiClient = NotesApiClient(
+        val apiClient = NotesApiClient(
             url = "http://10.0.2.2:3000/api/",
             tokenStore = globalTokenStore,
-        )
+        ).webservice
 
         globalAuthRepository = AuthRepository(
-            apiClient = globalApiClient.webservice,
+            apiClient = apiClient,
             tokenStore = globalTokenStore,
         )
 
-        globalNotesRepository = NotesRepository()
+        globalNotesRepository = NotesRepository(
+            apiClient = apiClient,
+        )
 
         setContent {
             NotesTheme {
