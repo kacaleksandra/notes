@@ -1,13 +1,5 @@
 package tech.pacia.notes.data
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
 import retrofit2.HttpException
 import retrofit2.Response
 
@@ -43,7 +35,6 @@ class AuthRepository(
             apiClient.signUp(UserRequest(email = email, password = password))
         }
     }
-
 
     suspend fun signIn(email: String, password: String): NetworkResult<SignInResponse> {
         val result = callSafely {
