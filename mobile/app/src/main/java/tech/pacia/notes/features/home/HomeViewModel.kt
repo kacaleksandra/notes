@@ -34,7 +34,10 @@ sealed interface NotesState {
     }
 }
 
-class NotesViewModel(private val notesRepository: NotesRepository) : ViewModel() {
+// TODO: Refactor NotesState to simple data class with properties like isRefreshing and isError.
+// No sealed classes are necessary since we'll simply listen to a flow from Room.
+
+class HomeViewModel(private val notesRepository: NotesRepository) : ViewModel() {
     private val _uiState: MutableStateFlow<NotesState> = MutableStateFlow(NotesState.Loading)
     val uiState: StateFlow<NotesState> = _uiState
 
@@ -91,7 +94,7 @@ class NotesViewModel(private val notesRepository: NotesRepository) : ViewModel()
             override fun <T : ViewModel> create(
                 modelClass: Class<T>,
                 extras: CreationExtras,
-            ): T = NotesViewModel(notesRepository = globalNotesRepository) as T
+            ): T = HomeViewModel(notesRepository = globalNotesRepository) as T
         }
     }
 }

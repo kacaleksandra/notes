@@ -10,18 +10,19 @@ fun HomeRoute(
     onNavigateToNote: (noteId: String) -> Unit,
     onSignOut: () -> Unit,
 ) {
-    val notesViewModel = viewModel(
-        modelClass = NotesViewModel::class.java,
-        factory = NotesViewModel.Factory,
+    val homeViewModel = viewModel(
+        modelClass = HomeViewModel::class.java,
+        factory = HomeViewModel.Factory,
     )
 
-    val notesUiState by notesViewModel.uiState.collectAsStateWithLifecycle()
+    val notesUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
 
     HomeScreen(
         notesUiState = notesUiState,
-        onCategoryClick = notesViewModel::toggleCategorySelected,
+        onCategoryClick = homeViewModel::toggleCategorySelected,
         onNavigateToNote = onNavigateToNote,
-        onDeleteNote = notesViewModel::deleteNote,
+        onDeleteNote = homeViewModel::deleteNote,
+        onRefresh = homeViewModel::refresh,
         onSignOut = onSignOut,
     )
 }
