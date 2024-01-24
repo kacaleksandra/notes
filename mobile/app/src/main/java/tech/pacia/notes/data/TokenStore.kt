@@ -19,8 +19,10 @@ class TokenStore(
         return runBlocking { dataStore.data.first()[PreferencesKeys.USER_ACCESS_TOKEN] }
     }
 
-
     suspend fun persistToken(token: String) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.USER_ACCESS_TOKEN] = token
+        }
     }
 
     suspend fun clearToken() {
