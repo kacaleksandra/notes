@@ -17,6 +17,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -41,9 +42,10 @@ import tech.pacia.notes.ui.theme.NotesTheme
 fun HomeScreen(
     modifier: Modifier = Modifier,
     notesUiState: NotesState,
-    onCategoryClick: (category: String) -> Unit = {},
     onNavigateToNote: (noteId: String) -> Unit = {},
-    onDeleteNote: (noteId: String) -> Unit = {},
+    onDeleteSelectedNotes: () -> Unit = {},
+    onSelectNote: (noteId: String) -> Unit = {},
+    onSelectCategory: (category: String) -> Unit = {},
     onRefresh: () -> Unit = {},
     onSignOut: () -> Unit = {},
 ) {
@@ -58,6 +60,15 @@ fun HomeScreen(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Sign out",
                         )
+                    }
+
+                    if (notesUiState is NotesState.Success && notesUiState.selectedNotesIds.isNotEmpty()) {
+                        IconButton(onClick = onDeleteSelectedNotes) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete selected notes",
+                            )
+                        }
                     }
                 },
             )
@@ -100,8 +111,8 @@ fun HomeScreen(
                 Spacer(modifier = Modifier)
                 for (category in notesUiState.categories) {
                     FilterChip(
-                        selected = notesUiState.selectedCategories.contains(category),
-                        onClick = { onCategoryClick(category) },
+                        selected = notesUiState.selectedCategoryIds.contains(category),
+                        onClick = { onSelectCategory(category) },
                         label = { Text(category) },
                     )
                 }
@@ -132,8 +143,15 @@ fun HomeScreen(
                         itemContent = { note ->
                             NoteCard(
                                 note = note,
-                                onClick = { onNavigateToNote(note.id) },
-                                onDelete = { onDeleteNote(note.id) },
+                                onClick = {
+                                    if (notesUiState.selectedNotesIds.isNotEmpty()) {
+                                        onSelectNote(note.id)
+                                    } else {
+                                        onNavigateToNote(note.id)
+                                    }
+                                },
+                                onSelect = { onSelectNote(note.id) },
+                                selected = notesUiState.selectedNotesIds.contains(note.id),
                             )
                         },
                     )
@@ -158,7 +176,8 @@ fun HomeScreenPreview() {
             notesUiState = NotesState.Success(
                 notes = NotesRepository.notes,
                 categories = setOf("All") + NotesRepository.categories,
-                selectedCategories = setOf("All", "Shopping"),
+                selectedCategoryIds = setOf("All", "Shopping"),
+                selectedNotesIds = setOf(),
             ),
         )
     }
@@ -172,7 +191,8 @@ fun HomeScreenPreviewDark() {
             notesUiState = NotesState.Success(
                 notes = NotesRepository.notes,
                 categories = setOf("All") + NotesRepository.categories,
-                selectedCategories = setOf(),
+                selectedCategoryIds = setOf(),
+                selectedNotesIds = setOf(),
             ),
         )
     }

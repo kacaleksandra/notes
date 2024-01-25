@@ -15,13 +15,14 @@ fun HomeRoute(
         factory = HomeViewModel.Factory,
     )
 
-    val notesUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+    val notesUiState = homeViewModel.uiState.collectAsStateWithLifecycle()
 
     HomeScreen(
-        notesUiState = notesUiState,
-        onCategoryClick = homeViewModel::toggleCategorySelected,
+        notesUiState = notesUiState.value,
         onNavigateToNote = onNavigateToNote,
-        onDeleteNote = homeViewModel::deleteNote,
+        onDeleteSelectedNotes = { /* TODO */ },
+        onSelectNote = homeViewModel::selectNote,
+        onSelectCategory = homeViewModel::selectCategory,
         onRefresh = homeViewModel::refresh,
         onSignOut = onSignOut,
     )

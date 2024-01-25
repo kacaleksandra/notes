@@ -20,15 +20,16 @@ sealed interface NotesState {
     data class Success(
         val notes: List<Note>,
         val categories: Set<String>,
-        val selectedCategories: Set<String>,
+        val selectedCategoryIds: Set<String>,
+        val selectedNotesIds: Set<String>,
     ) : NotesState {
 
         val selectedNotes: List<Note>
             get() {
-                if (selectedCategories.isEmpty()) return notes
+                if (selectedCategoryIds.isEmpty()) return notes
 
                 return notes.filter { note ->
-                    note.categories.any { selectedCategories.contains(it) }
+                    note.categories.any { selectedCategoryIds.contains(it) }
                 }
             }
     }
@@ -50,7 +51,7 @@ class HomeViewModel(private val notesRepository: NotesRepository) : ViewModel() 
         viewModelScope.launch {
             val state = uiState.value
             val selectedCategories =
-                if (state is NotesState.Success) state.selectedCategories else setOf()
+                if (state is NotesState.Success) state.selectedCategoryIds else setOf()
 
             _uiState.value = NotesState.Loading
             delay(1_000)
@@ -59,7 +60,8 @@ class HomeViewModel(private val notesRepository: NotesRepository) : ViewModel() 
                 _uiState.value = NotesState.Success(
                     categories = notesRepository.loadCategories(),
                     notes = notesRepository.loadNotes(),
-                    selectedCategories = selectedCategories,
+                    selectedCategoryIds = selectedCategories,
+                    selectedNotesIds = setOf(),
                 )
             } catch (exception: Exception) {
                 _uiState.value = NotesState.Error("Failed")
@@ -67,25 +69,40 @@ class HomeViewModel(private val notesRepository: NotesRepository) : ViewModel() 
         }
     }
 
-    fun toggleCategorySelected(categoryId: String) {
-        val state = _uiState.value
-        if (state !is NotesState.Success) return
-
-        if (state.selectedCategories.contains(categoryId)) {
-            _uiState.value = state.copy(
-                selectedCategories = state.selectedCategories.minusElement(categoryId),
-            )
-        } else {
-            _uiState.value = state.copy(
-                selectedCategories = state.selectedCategories.plusElement(categoryId),
-            )
-        }
-    }
-
     fun deleteNote(noteId: String) {
         viewModelScope.launch {
             notesRepository.deleteNoteById(noteId)
             refresh()
+        }
+    }
+
+    fun selectNote(noteId: String) {
+        val state = _uiState.value
+        if (state !is NotesState.Success) return
+
+        if (state.selectedNotesIds.contains(noteId)) {
+            _uiState.value = state.copy(
+                selectedNotesIds = state.selectedNotesIds.minusElement(noteId),
+            )
+        } else {
+            _uiState.value = state.copy(
+                selectedNotesIds = state.selectedNotesIds.plusElement(noteId),
+            )
+        }
+    }
+
+    fun selectCategory(categoryId: String) {
+        val state = _uiState.value
+        if (state !is NotesState.Success) return
+
+        if (state.selectedCategoryIds.contains(categoryId)) {
+            _uiState.value = state.copy(
+                selectedCategoryIds = state.selectedCategoryIds.minusElement(categoryId),
+            )
+        } else {
+            _uiState.value = state.copy(
+                selectedCategoryIds = state.selectedCategoryIds.plusElement(categoryId),
+            )
         }
     }
 
