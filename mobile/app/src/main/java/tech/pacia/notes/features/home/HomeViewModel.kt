@@ -106,6 +106,17 @@ class HomeViewModel(private val notesRepository: NotesRepository) : ViewModel() 
         }
     }
 
+    fun deleteSelectedNotes() {
+        val state = _uiState.value
+        if (state !is NotesState.Success) return
+
+        if (state.selectedNotesIds.isEmpty()) return
+
+        _uiState.value = state.copy(
+            notes = state.notes.filterNot { note -> state.selectedNotesIds.contains(note.id) }
+        )
+    }
+
     companion object {
         val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")

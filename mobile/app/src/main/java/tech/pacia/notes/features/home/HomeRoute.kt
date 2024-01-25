@@ -20,7 +20,7 @@ fun HomeRoute(
     HomeScreen(
         notesUiState = notesUiState.value,
         onNavigateToNote = onNavigateToNote,
-        onDeleteSelectedNotes = { /* TODO */ },
+        onDeleteSelectedNotes = homeViewModel::deleteSelectedNotes,
         onSelectNote = homeViewModel::selectNote,
         onSelectCategory = homeViewModel::selectCategory,
         onRefresh = homeViewModel::refresh,

@@ -1,6 +1,7 @@
 package tech.pacia.notes.features.home
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,7 +38,10 @@ import androidx.compose.ui.unit.dp
 import tech.pacia.notes.data.NotesRepository
 import tech.pacia.notes.ui.theme.NotesTheme
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(
+    ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class,
+    ExperimentalFoundationApi::class
+)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -142,6 +146,7 @@ fun HomeScreen(
                         key = { note -> note.id },
                         itemContent = { note ->
                             NoteCard(
+                                modifier = Modifier.animateItemPlacement(),
                                 note = note,
                                 onClick = {
                                     if (notesUiState.selectedNotesIds.isNotEmpty()) {
