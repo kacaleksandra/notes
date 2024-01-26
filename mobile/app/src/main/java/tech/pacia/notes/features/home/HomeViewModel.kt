@@ -32,6 +32,9 @@ sealed interface NotesState {
                     note.categories.any { selectedCategoryIds.contains(it) }
                 }
             }
+
+        val selectionModeEnabled: Boolean
+            get() = selectedNotesIds.isNotEmpty()
     }
 }
 
@@ -113,7 +116,7 @@ class HomeViewModel(private val notesRepository: NotesRepository) : ViewModel() 
         if (state.selectedNotesIds.isEmpty()) return
 
         _uiState.value = state.copy(
-            notes = state.notes.filterNot { note -> state.selectedNotesIds.contains(note.id) }
+            notes = state.notes.filterNot { note -> state.selectedNotesIds.contains(note.id) },
         )
     }
 

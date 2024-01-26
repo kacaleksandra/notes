@@ -16,9 +16,11 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ExtendedFloatingActionButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -39,8 +41,9 @@ import tech.pacia.notes.data.NotesRepository
 import tech.pacia.notes.ui.theme.NotesTheme
 
 @OptIn(
-    ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class,
-    ExperimentalFoundationApi::class
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterialApi::class,
+    ExperimentalFoundationApi::class,
 )
 @Composable
 fun HomeScreen(
@@ -57,7 +60,7 @@ fun HomeScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text("My notes super app") },
+                title = { Text(appBarText(notesUiState)) },
                 actions = {
                     IconButton(onClick = onSignOut) {
                         Icon(
@@ -66,7 +69,7 @@ fun HomeScreen(
                         )
                     }
 
-                    if (notesUiState is NotesState.Success && notesUiState.selectedNotesIds.isNotEmpty()) {
+                    if (notesUiState is NotesState.Success && notesUiState.selectionModeEnabled) {
                         IconButton(onClick = onDeleteSelectedNotes) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
@@ -75,6 +78,13 @@ fun HomeScreen(
                         }
                     }
                 },
+            )
+        },
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = { },
+                icon = { Icon(Icons.Filled.Edit, "Create note") },
+                text = { Text(text = "Create note") },
             )
         },
     ) { paddingValues ->
@@ -156,6 +166,11 @@ fun HomeScreen(
                                     }
                                 },
                                 onSelect = { onSelectNote(note.id) },
+                                onCategoryClick = if (notesUiState.selectionModeEnabled) {
+                                    { _ -> onSelectNote(note.id) }
+                                } else {
+                                    onSelectCategory
+                                },
                                 selected = notesUiState.selectedNotesIds.contains(note.id),
                             )
                         },
@@ -170,6 +185,15 @@ fun HomeScreen(
                 )
             }
         }
+    }
+}
+
+private fun appBarText(notesUiState: NotesState): String {
+    return if (notesUiState is NotesState.Success && notesUiState.selectionModeEnabled) {
+        val noun = if (notesUiState.selectedNotesIds.size == 1) "note" else "notes"
+        "${notesUiState.selectedNotesIds.size} $noun selected"
+    } else {
+        "My notes super app"
     }
 }
 

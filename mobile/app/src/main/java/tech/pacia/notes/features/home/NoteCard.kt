@@ -1,6 +1,7 @@
 package tech.pacia.notes.features.home
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -20,7 +21,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,22 +42,21 @@ fun NoteCard(
     note: Note,
     onClick: () -> Unit = {},
     onSelect: () -> Unit = {},
+    onCategoryClick: ((categoryId: String) -> Unit)? = {},
     selected: Boolean = false,
 ) {
+    val borderColor by animateColorAsState(
+        targetValue = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent,
+        label = "border animation",
+    )
+
     Card(
         modifier = modifier.combinedClickable(
             onClick = onClick,
             onLongClick = onSelect,
         ),
         shape = RoundedCornerShape(8.dp),
-        border = if (selected) {
-            BorderStroke(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.primary,
-            )
-        } else {
-            null
-        },
+        border = BorderStroke(width = 1.dp, color = borderColor),
     ) {
         Column(
             modifier = Modifier.padding(8.dp),
@@ -82,7 +84,7 @@ fun NoteCard(
                     CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
                         FilterChip(
                             selected = true,
-                            onClick = { },
+                            onClick = { onCategoryClick?.invoke(category) },
                             label = { Text(category) },
                         )
                     }
