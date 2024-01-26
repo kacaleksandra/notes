@@ -48,7 +48,7 @@ import tech.pacia.notes.ui.theme.NotesTheme
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    notesUiState: NotesState,
+    uiState: NotesState,
     onNavigateToNote: (noteId: String) -> Unit = {},
     onDeleteSelectedNotes: () -> Unit = {},
     onSelectNote: (noteId: String) -> Unit = {},
@@ -60,7 +60,7 @@ fun HomeScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text(appBarText(notesUiState)) },
+                title = { Text(appBarText(uiState)) },
                 actions = {
                     IconButton(onClick = onSignOut) {
                         Icon(
@@ -69,7 +69,7 @@ fun HomeScreen(
                         )
                     }
 
-                    if (notesUiState is NotesState.Success && notesUiState.selectionModeEnabled) {
+                    if (uiState is NotesState.Success && uiState.selectionModeEnabled) {
                         IconButton(onClick = onDeleteSelectedNotes) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
@@ -90,11 +90,11 @@ fun HomeScreen(
     ) { paddingValues ->
 
         val pullRefreshState = rememberPullRefreshState(
-            refreshing = notesUiState is NotesState.Loading,
+            refreshing = uiState is NotesState.Loading,
             onRefresh = onRefresh,
         )
 
-        if (notesUiState is NotesState.Loading) {
+        if (uiState is NotesState.Loading) {
             Box(modifier = Modifier.fillMaxSize()) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
@@ -102,18 +102,18 @@ fun HomeScreen(
             return@Scaffold
         }
 
-        if (notesUiState is NotesState.Error) {
+        if (uiState is NotesState.Error) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Text(
                     modifier = Modifier.align(Alignment.Center),
-                    text = notesUiState.message,
+                    text = uiState.message,
                 )
             }
 
             return@Scaffold
         }
 
-        if (notesUiState !is NotesState.Success) {
+        if (uiState !is NotesState.Success) {
             return@Scaffold
         }
 
@@ -123,9 +123,9 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Spacer(modifier = Modifier)
-                for (category in notesUiState.categories) {
+                for (category in uiState.categories) {
                     FilterChip(
-                        selected = notesUiState.selectedCategoryIds.contains(category),
+                        selected = uiState.selectedCategoryIds.contains(category),
                         onClick = { onSelectCategory(category) },
                         label = { Text(category) },
                     )
@@ -138,7 +138,7 @@ fun HomeScreen(
                     .fillMaxSize()
                     .pullRefresh(pullRefreshState),
             ) {
-                if (notesUiState.selectedNotes.isEmpty()) {
+                if (uiState.selectedNotes.isEmpty()) {
                     Text(
                         modifier = Modifier.align(Alignment.Center),
                         text = "You don't have any notes",
@@ -152,33 +152,33 @@ fun HomeScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(
-                        items = notesUiState.selectedNotes,
+                        items = uiState.selectedNotes,
                         key = { note -> note.id },
                         itemContent = { note ->
                             NoteCard(
                                 modifier = Modifier.animateItemPlacement(),
                                 note = note,
                                 onClick = {
-                                    if (notesUiState.selectedNotesIds.isNotEmpty()) {
+                                    if (uiState.selectedNotesIds.isNotEmpty()) {
                                         onSelectNote(note.id)
                                     } else {
                                         onNavigateToNote(note.id)
                                     }
                                 },
                                 onSelect = { onSelectNote(note.id) },
-                                onCategoryClick = if (notesUiState.selectionModeEnabled) {
+                                onCategoryClick = if (uiState.selectionModeEnabled) {
                                     { _ -> onSelectNote(note.id) }
                                 } else {
                                     onSelectCategory
                                 },
-                                selected = notesUiState.selectedNotesIds.contains(note.id),
+                                selected = uiState.selectedNotesIds.contains(note.id),
                             )
                         },
                     )
                 }
 
                 PullRefreshIndicator(
-                    refreshing = notesUiState is NotesState.Loading,
+                    refreshing = uiState is NotesState.Loading,
                     state = pullRefreshState,
                     modifier = Modifier.align(Alignment.TopCenter),
                     // backgroundColor = if (viewModel.state.value.isLoading) Color.Red else Color.Green,
@@ -202,7 +202,7 @@ private fun appBarText(notesUiState: NotesState): String {
 fun HomeScreenPreview() {
     NotesTheme {
         HomeScreen(
-            notesUiState = NotesState.Success(
+            uiState = NotesState.Success(
                 notes = NotesRepository.notes,
                 categories = setOf("All") + NotesRepository.categories,
                 selectedCategoryIds = setOf("All", "Shopping"),
@@ -217,7 +217,7 @@ fun HomeScreenPreview() {
 fun HomeScreenPreviewDark() {
     NotesTheme {
         HomeScreen(
-            notesUiState = NotesState.Success(
+            uiState = NotesState.Success(
                 notes = NotesRepository.notes,
                 categories = setOf("All") + NotesRepository.categories,
                 selectedCategoryIds = setOf(),

@@ -1,7 +1,6 @@
 package tech.pacia.notes.features.home
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -15,10 +14,10 @@ fun HomeRoute(
         factory = HomeViewModel.Factory,
     )
 
-    val notesUiState = homeViewModel.uiState.collectAsStateWithLifecycle()
+    val uiState = homeViewModel.uiState.collectAsStateWithLifecycle()
 
     HomeScreen(
-        notesUiState = notesUiState.value,
+        uiState = uiState.value,
         onNavigateToNote = onNavigateToNote,
         onDeleteSelectedNotes = homeViewModel::deleteSelectedNotes,
         onSelectNote = homeViewModel::selectNote,
