@@ -1,5 +1,6 @@
 package tech.pacia.notes.features.signin
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -40,7 +41,11 @@ class SignInViewModel(private val authRepository: AuthRepository) : ViewModel() 
 
             val result = authRepository.signIn(email, password)
             when (result) {
-                is Exception -> _uiState.value = SignInState.Error("Fatal error while signing in")
+                is Exception -> {
+                    Log.d(this::class.simpleName, "Failed to sign in: ${result.e}")
+                    _uiState.value = SignInState.Error("Fatal error while signing in")
+                }
+
                 is Error -> _uiState.value = SignInState.Error(result.message ?: "Sign in failed")
                 is Success -> _uiState.value = SignInState.Success
             }

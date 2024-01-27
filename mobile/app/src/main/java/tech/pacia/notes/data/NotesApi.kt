@@ -20,7 +20,6 @@ data class UserRequest(
 @Serializable
 data class SignInResponse(
     val accessToken: String,
-    val email: String,
 )
 
 interface NotesApi {

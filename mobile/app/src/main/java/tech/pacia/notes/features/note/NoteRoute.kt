@@ -2,10 +2,8 @@ package tech.pacia.notes.features.note
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.MutableCreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
-import tech.pacia.notes.features.home.HomeViewModel
 
 @Suppress("UnusedParameter")
 @Composable
