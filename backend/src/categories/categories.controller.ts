@@ -18,6 +18,7 @@ import {
   ApiBody,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { CategoryEntity } from './entities/category.entity';
@@ -33,6 +34,10 @@ export class CategoriesController {
 
   @Post()
   @ApiCreatedResponse({ type: CategoryEntity })
+  @ApiOperation({
+    summary: 'Create category',
+    description: 'Create a new category.',
+  })
   @ApiBody({
     type: CreateCategoryDto,
     description: 'Example of creating a category',
@@ -48,18 +53,30 @@ export class CategoriesController {
 
   @Delete(':id')
   @HttpCode(204)
+  @ApiOperation({
+    summary: 'Delete category by id',
+    description: 'Delete a category by id.',
+  })
   async remove(@User() user: Users, @Param('id', ParseIntPipe) id: number) {
     await this.categoriesService.remove(user.id, id);
   }
 
   @Get()
   @ApiOkResponse({ type: [CategoryEntity] })
+  @ApiOperation({
+    summary: 'Get all categories',
+    description: 'Get all categories.',
+  })
   async findAll(@User() user: Users) {
     return this.categoriesService.findAll(user.id);
   }
 
   @Get(':id')
   @ApiOkResponse({ type: CategoryEntity })
+  @ApiOperation({
+    summary: 'Get category by id',
+    description: 'Get category by specific id.',
+  })
   async findOne(@User() user: Users, @Param('id', ParseIntPipe) id: number) {
     return this.categoriesService.findOne(user.id, id);
   }

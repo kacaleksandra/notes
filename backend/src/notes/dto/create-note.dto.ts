@@ -14,7 +14,7 @@ export class CreateNoteDto {
 
   @ApiPropertyOptional({
     type: [Number],
-    example: [1, 2], // Przykładowe dane dla categoryIds
+    description: 'Optional array of category IDs.',
   })
   @IsOptional()
   @IsNumber({}, { each: true })
