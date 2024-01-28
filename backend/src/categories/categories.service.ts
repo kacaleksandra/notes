@@ -58,7 +58,6 @@ export class CategoriesService {
 
       try {
         await prisma.noteCategories.deleteMany({ where: { categoryId } });
-        console.log('sjsj');
         await prisma.categories.delete({ where: { id: categoryId } });
       } catch (error) {
         throw new InternalServerErrorException('Failed to delete category');
@@ -80,7 +79,6 @@ export class CategoriesService {
     });
 
     if (!category) {
-      // Kategoria o podanym id nie istnieje
       throw new NotFoundException('Category not found');
     }
 

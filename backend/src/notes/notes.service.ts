@@ -183,17 +183,34 @@ export class NotesService {
   }
 
   async findAllByCategory(userId: number, categoryId: number) {
-    const notes = await this.prisma.notes.findMany({
-      where: {
-        userId,
-        NoteCategories: {
-          some: {
-            categoryId,
-          },
-        },
-      },
+    const category = await this.prisma.categories.findUnique({
+      where: { id: categoryId, userId },
     });
 
-    return notes.map((note) => plainToClass(NoteEntity, note));
+    console.log(category);
+
+    if (!category) {
+      throw new NotFoundException(
+        `Category with ID ${categoryId} not found or does not belong to the user`,
+      );
+    }
+    try {
+      const notes = await this.prisma.notes.findMany({
+        where: {
+          userId,
+          NoteCategories: {
+            some: {
+              categoryId,
+            },
+          },
+        },
+      });
+
+      return notes.map((note) => plainToClass(NoteEntity, note));
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Failed to fetch notes by category',
+      );
+    }
   }
 }

@@ -31,6 +31,7 @@ export class UsersController {
     summary: 'Create user',
     description: 'Create a new user',
   })
+  @ApiOkResponse({ status: 409, description: 'Conflict: User exists' })
   async create(@Body() createUserDto: CreateUserDto) {
     return new UserEntity(await this.usersService.create(createUserDto));
   }

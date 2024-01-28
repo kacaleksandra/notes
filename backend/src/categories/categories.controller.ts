@@ -19,6 +19,7 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { CategoryEntity } from './entities/category.entity';
@@ -57,12 +58,19 @@ export class CategoriesController {
     summary: 'Delete category by id',
     description: 'Delete a category by id.',
   })
+  @ApiResponse({ status: 204, description: 'Category deleted successfully' })
+  @ApiResponse({ status: 404, description: 'Category not found' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden: Category does not belong to the user',
+  })
   async remove(@User() user: Users, @Param('id', ParseIntPipe) id: number) {
     await this.categoriesService.remove(user.id, id);
   }
 
   @Get()
   @ApiOkResponse({ type: [CategoryEntity] })
+  @ApiResponse({ status: 200, description: 'OK', type: [CategoryEntity] })
   @ApiOperation({
     summary: 'Get all categories',
     description: 'Get all categories.',
@@ -77,6 +85,8 @@ export class CategoriesController {
     summary: 'Get category by id',
     description: 'Get category by specific id.',
   })
+  @ApiResponse({ status: 200, description: 'OK', type: CategoryEntity })
+  @ApiResponse({ status: 404, description: 'Category not found' })
   async findOne(@User() user: Users, @Param('id', ParseIntPipe) id: number) {
     return this.categoriesService.findOne(user.id, id);
   }
