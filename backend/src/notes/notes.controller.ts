@@ -97,7 +97,6 @@ export class NotesController {
   }
 
   @Get()
-  @ApiOkResponse({ type: [NoteEntity] })
   @ApiOperation({
     summary: 'Get all notes',
     description: 'Retrieve a list of all notes for logged in user.',
@@ -107,7 +106,6 @@ export class NotesController {
   }
 
   @Get(':id')
-  @ApiOkResponse({ type: NoteEntity })
   @ApiOperation({
     summary: 'Get note by id',
     description: 'Retrieve a list of all notes.',

@@ -65,6 +65,8 @@ export class NotesService {
       const noteWithoutInfo = plainToClass(NoteEntity, {
         id: createdNote.id,
         title: createdNote.title,
+        content: createdNote.content,
+        created_at: createdNote.created_at,
       });
 
       return noteWithoutInfo;
@@ -127,6 +129,7 @@ export class NotesService {
         id: updatedNote.id,
         title: updatedNote.title,
         content: updatedNote.content,
+        created_at: updatedNote.created_at,
       });
     } catch (error) {
       throw new InternalServerErrorException('Failed to update note');
