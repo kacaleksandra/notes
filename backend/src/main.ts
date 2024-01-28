@@ -11,7 +11,6 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   const config = new DocumentBuilder()
     .setTitle('Notes app')
-    .setDescription('The notes API description')
     .setVersion('1.0')
     .addBearerAuth()
     .addTag('notes')

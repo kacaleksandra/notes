@@ -6,5 +6,6 @@ import { PrismaClient } from '@prisma/client';
 @Module({
   controllers: [NotesController],
   providers: [NotesService, PrismaClient],
+  exports: [NotesService],
 })
 export class NotesModule {}
