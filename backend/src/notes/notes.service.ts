@@ -162,7 +162,7 @@ export class NotesService {
     }
   }
 
-  findAll(userId: number) {
+  async findAll(userId: number) {
     return this.prisma.notes.findMany({
       where: { userId },
       include: { NoteCategories: true },
