@@ -42,24 +42,28 @@ export class CategoriesService {
     }
   }
 
-  async remove(userId: number, id: number) {
-    const category = await this.prisma.categories.findUnique({
-      where: { id, userId },
+  async remove(userId: number, categoryId: number) {
+    return this.prisma.$transaction(async (prisma) => {
+      const category = await prisma.categories.findUnique({
+        where: { id: categoryId, userId },
+      });
+
+      if (!category) {
+        throw new NotFoundException('Category not found');
+      }
+
+      if (category.userId !== userId) {
+        throw new ForbiddenException('Category does not belong to the user');
+      }
+
+      try {
+        await prisma.noteCategories.deleteMany({ where: { categoryId } });
+        console.log('sjsj');
+        await prisma.categories.delete({ where: { id: categoryId } });
+      } catch (error) {
+        throw new InternalServerErrorException('Failed to delete category');
+      }
     });
-
-    if (!category) {
-      throw new NotFoundException('Category not found');
-    }
-
-    if (category.userId !== userId) {
-      throw new ForbiddenException('Category does not belong to the user');
-    }
-
-    try {
-      await this.prisma.categories.delete({ where: { id } });
-    } catch (error) {
-      throw new InternalServerErrorException('Failed to delete category');
-    }
   }
 
   findAll(userId: number) {
