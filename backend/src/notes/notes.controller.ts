@@ -61,7 +61,7 @@ export class NotesController {
     return this.notesService.findOne(user.id, id);
   }
 
-  @Get('category/:categoryId')
+  @Get('by-category/:categoryId')
   async findAllByCategory(
     @User() user: Users,
     @Param('categoryId', ParseIntPipe) categoryId: number,
