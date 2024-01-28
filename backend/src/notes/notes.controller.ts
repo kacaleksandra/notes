@@ -10,7 +10,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth-guard';
 import { NotesService } from './notes.service';
 import { User } from 'common/decorators/user.decorator';
@@ -21,6 +21,7 @@ import { Users } from '@prisma/client';
 @Controller('notes')
 @ApiTags('notes')
 @UseGuards(JwtAuthGuard)
+@ApiBearerAuth('access-token')
 export class NotesController {
   constructor(private readonly notesService: NotesService) {}
 

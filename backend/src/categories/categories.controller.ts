@@ -14,6 +14,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth-guard';
 import { CategoriesService } from './categories.service';
 import { Users } from '@prisma/client';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiOkResponse,
@@ -26,6 +27,7 @@ import { User } from 'common/decorators/user.decorator';
 @Controller('categories')
 @ApiTags('categories')
 @UseGuards(JwtAuthGuard)
+@ApiBearerAuth('access-token')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
