@@ -18,16 +18,18 @@ export class NotesService {
   async create(userId: number, createNoteDto: CreateNoteDto) {
     isUserExist(this.prisma, userId);
 
-    const category = createNoteDto.categoryId
-      ? await this.prisma.categories.findUnique({
-          where: { id: createNoteDto.categoryId, userId },
-        })
-      : null;
+    if (createNoteDto.categoryIds) {
+      for (const categoryId of createNoteDto.categoryIds) {
+        const category = await this.prisma.categories.findUnique({
+          where: { id: categoryId, userId },
+        });
 
-    if (createNoteDto.categoryId && !category) {
-      throw new NotFoundException(
-        'Category not found or does not belong to the user',
-      );
+        if (!category) {
+          throw new NotFoundException(
+            `Category with ID ${categoryId} not found or does not belong to the user`,
+          );
+        }
+      }
     }
 
     const existingNote = await this.prisma.notes.findFirst({
@@ -47,13 +49,17 @@ export class NotesService {
         },
       });
 
-      if (createNoteDto.categoryId) {
-        await this.prisma.noteCategories.create({
-          data: {
-            noteId: createdNote.id,
-            categoryId: createNoteDto.categoryId,
-          },
-        });
+      // Create NoteCategories records for each category
+      if (createNoteDto.categoryIds && createNoteDto.categoryIds.length > 0) {
+        console.log('test');
+        for (const categoryId of createNoteDto.categoryIds) {
+          await this.prisma.noteCategories.create({
+            data: {
+              noteId: createdNote.id,
+              categoryId,
+            },
+          });
+        }
       }
 
       const noteWithoutInfo = plainToClass(NoteEntity, {
@@ -92,21 +98,24 @@ export class NotesService {
       });
 
       // Jeśli przesłano categoryId, to aktualizujemy wpis w tabeli pośredniczącej
-      if (updateNoteDto.categoryId !== undefined) {
-        // Usuwamy poprzedni wpis w tabeli pośredniczącej, jeśli istnieje
-        if (note.NoteCategories.length > 0) {
-          await this.prisma.noteCategories.deleteMany({
-            where: { noteId: id },
-          });
-        }
+      if (
+        updateNoteDto.categoryIds !== undefined &&
+        updateNoteDto.categoryIds.length > 0
+      ) {
+        // Usuwamy poprzednie wpisy w tabeli pośredniczącej
+        await this.prisma.noteCategories.deleteMany({
+          where: { noteId: id },
+        });
 
         // Dodajemy nowy wpis w tabeli pośredniczącej
-        await this.prisma.noteCategories.create({
-          data: {
-            noteId: id,
-            categoryId: updateNoteDto.categoryId,
-          },
-        });
+        for (const categoryId of updateNoteDto.categoryIds) {
+          await this.prisma.noteCategories.create({
+            data: {
+              noteId: id,
+              categoryId,
+            },
+          });
+        }
       } else {
         // Jeśli categoryId nie jest przesłane, usuwamy wszelkie powiązania w tabeli pośredniczącej
         await this.prisma.noteCategories.deleteMany({
