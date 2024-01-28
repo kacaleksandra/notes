@@ -14,24 +14,34 @@ model Users {
   email      String       @unique
   password   String
   notes      Notes[]
-  Categories Categories[]
+  categories Categories[]
 }
 
 model Categories {
-  id     Int     @id @default(autoincrement())
-  title  String
-  userId Int
-  user   Users   @relation(fields: [userId], references: [id])
-  notes  Notes[]
+  id             Int              @id @default(autoincrement())
+  title          String
+  userId         Int
+  user           Users            @relation(fields: [userId], references: [id])
+  notes          Notes[]
+  NoteCategories NoteCategories[]
 }
 
 model Notes {
-  id         Int        @id @default(autoincrement())
-  title      String
-  content    String
-  created_at DateTime   @default(now())
-  userId     Int
-  categoryId Int
-  user       Users      @relation(fields: [userId], references: [id])
+  id             Int              @id @default(autoincrement())
+  title          String
+  content        String
+  created_at     DateTime         @default(now())
+  userId         Int
+  user           Users            @relation(fields: [userId], references: [id])
+  categories     Categories[]
+  NoteCategories NoteCategories[]
+}
+
+model NoteCategories {
+  noteId     Int // Note ID
+  categoryId Int // Category ID
+  note       Notes      @relation(fields: [noteId], references: [id])
   category   Categories @relation(fields: [categoryId], references: [id])
+
+  @@id([noteId, categoryId])
 }

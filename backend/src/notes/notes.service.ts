@@ -18,11 +18,13 @@ export class NotesService {
   async create(userId: number, createNoteDto: CreateNoteDto) {
     isUserExist(this.prisma, userId);
 
-    const category = await this.prisma.categories.findUnique({
-      where: { id: createNoteDto.categoryId, userId },
-    });
+    const category = createNoteDto.categoryId
+      ? await this.prisma.categories.findUnique({
+          where: { id: createNoteDto.categoryId, userId },
+        })
+      : null;
 
-    if (!category) {
+    if (createNoteDto.categoryId && !category) {
       throw new NotFoundException(
         'Category not found or does not belong to the user',
       );
@@ -38,8 +40,21 @@ export class NotesService {
 
     try {
       const createdNote = await this.prisma.notes.create({
-        data: { ...createNoteDto, userId },
+        data: {
+          title: createNoteDto.title,
+          content: createNoteDto.content,
+          userId,
+        },
       });
+
+      if (createNoteDto.categoryId) {
+        await this.prisma.noteCategories.create({
+          data: {
+            noteId: createdNote.id,
+            categoryId: createNoteDto.categoryId,
+          },
+        });
+      }
 
       const noteWithoutInfo = plainToClass(NoteEntity, {
         id: createdNote.id,
@@ -55,6 +70,7 @@ export class NotesService {
   async update(userId: number, id: number, updateNoteDto: CreateNoteDto) {
     const note = await this.prisma.notes.findUnique({
       where: { id, userId },
+      include: { NoteCategories: true }, // Pobieramy powiązane kategorie
     });
 
     if (!note) {
@@ -66,16 +82,42 @@ export class NotesService {
     }
 
     try {
+      // Aktualizujemy notatkę (bez uwzględniania categoryId)
       const updatedNote = await this.prisma.notes.update({
         where: { id },
-        data: updateNoteDto,
+        data: {
+          title: updateNoteDto.title,
+          content: updateNoteDto.content,
+        },
       });
+
+      // Jeśli przesłano categoryId, to aktualizujemy wpis w tabeli pośredniczącej
+      if (updateNoteDto.categoryId !== undefined) {
+        // Usuwamy poprzedni wpis w tabeli pośredniczącej, jeśli istnieje
+        if (note.NoteCategories.length > 0) {
+          await this.prisma.noteCategories.deleteMany({
+            where: { noteId: id },
+          });
+        }
+
+        // Dodajemy nowy wpis w tabeli pośredniczącej
+        await this.prisma.noteCategories.create({
+          data: {
+            noteId: id,
+            categoryId: updateNoteDto.categoryId,
+          },
+        });
+      } else {
+        // Jeśli categoryId nie jest przesłane, usuwamy wszelkie powiązania w tabeli pośredniczącej
+        await this.prisma.noteCategories.deleteMany({
+          where: { noteId: id },
+        });
+      }
 
       return plainToClass(NoteEntity, {
         id: updatedNote.id,
         title: updatedNote.title,
         content: updatedNote.content,
-        categoryId: updatedNote.categoryId,
       });
     } catch (error) {
       throw new InternalServerErrorException('Failed to update note');
@@ -85,6 +127,7 @@ export class NotesService {
   async remove(userId: number, id: number) {
     const note = await this.prisma.notes.findUnique({
       where: { id, userId },
+      include: { NoteCategories: true }, // Pobieramy powiązane kategorie
     });
 
     if (!note) {
@@ -96,6 +139,14 @@ export class NotesService {
     }
 
     try {
+      // Usuwamy powiązania z tabeli pośredniczącej, jeśli istnieją
+      if (note.NoteCategories.length > 0) {
+        await this.prisma.noteCategories.deleteMany({
+          where: { noteId: id },
+        });
+      }
+
+      // Usuwamy notatkę
       await this.prisma.notes.delete({ where: { id } });
     } catch (error) {
       throw new InternalServerErrorException('Failed to delete note');
@@ -105,14 +156,14 @@ export class NotesService {
   findAll(userId: number) {
     return this.prisma.notes.findMany({
       where: { userId },
-      select: { id: true, title: true, content: true, categoryId: true },
+      include: { NoteCategories: true },
     });
   }
 
   async findOne(userId: number, id: number) {
     const note = await this.prisma.notes.findUnique({
       where: { id, userId },
-      select: { id: true, title: true, content: true, categoryId: true },
+      include: { NoteCategories: true },
     });
 
     if (!note) {
@@ -120,5 +171,20 @@ export class NotesService {
     }
 
     return note;
+  }
+
+  async findAllByCategory(userId: number, categoryId: number) {
+    const notes = await this.prisma.notes.findMany({
+      where: {
+        userId,
+        NoteCategories: {
+          some: {
+            categoryId,
+          },
+        },
+      },
+    });
+
+    return notes.map((note) => plainToClass(NoteEntity, note));
   }
 }

@@ -60,4 +60,12 @@ export class NotesController {
   async findOne(@User() user: Users, @Param('id', ParseIntPipe) id: number) {
     return this.notesService.findOne(user.id, id);
   }
+
+  @Get('category/:categoryId')
+  async findAllByCategory(
+    @User() user: Users,
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+  ) {
+    return this.notesService.findAllByCategory(user.id, categoryId);
+  }
 }
