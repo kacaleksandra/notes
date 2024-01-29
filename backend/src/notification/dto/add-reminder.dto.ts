@@ -4,7 +4,7 @@ import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 export class AddReminderDto {
   @ApiProperty({
     description: 'Reminder date',
-    type: String,
+    type: Date,
   })
   @IsNotEmpty()
   @IsString()
