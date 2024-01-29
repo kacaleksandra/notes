@@ -20,7 +20,6 @@ import {
 import { JwtAuthGuard } from 'src/auth/jwt-auth-guard';
 import { User } from 'common/decorators/user.decorator';
 import { Users } from '@prisma/client';
-import { AddTokenDto } from './dto/add-token.dto';
 import { AddReminderDto } from './dto/add-reminder.dto';
 
 @Controller('notification')
@@ -81,62 +80,6 @@ export class NotificationController {
     @Param('reminderId', ParseIntPipe) reminderId: number,
   ) {
     return this.notificationService.removeReminder(user.id, reminderId);
-  }
-
-  @Post('token')
-  @ApiOperation({
-    summary: 'Save FCM Token',
-    description:
-      'Save the Firebase Cloud Messaging (FCM) token for notifications.',
-  })
-  @ApiBody({
-    type: AddTokenDto,
-    description: 'FCM Token to be saved.',
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'Token saved successfully.',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad Request.',
-  })
-  @ApiConflictResponse({
-    description: 'Conflict: Token already exists.',
-  })
-  async saveToken(@User() user: Users, @Body() body: { token: string }) {
-    const { token } = body;
-    return await this.notificationService.saveToken(user.id, token);
-  }
-
-  @Delete('token/:tokenId')
-  @ApiOperation({
-    summary: 'Remove FCM Token',
-    description:
-      'Remove the Firebase Cloud Messaging (FCM) token for notifications.',
-  })
-  @ApiParam({
-    name: 'tokenId',
-    description: 'ID of the FCM token to be removed',
-    type: Number,
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Token removed successfully.',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad Request.',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Not Found: Token not found or does not belong to the user.',
-  })
-  async removeToken(
-    @User() user: Users,
-    @Param('tokenId', ParseIntPipe) tokenId: number,
-  ) {
-    return this.notificationService.removeToken(user.id, tokenId);
   }
 
   // async sendingNotificationOneUser(@Body() body: { token: string }) {

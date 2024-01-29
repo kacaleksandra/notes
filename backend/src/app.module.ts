@@ -4,6 +4,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { NotesModule } from './notes/notes.module';
 import { NotificationModule } from './notification/notification.module';
 import { ScheduleAppModule } from './schedule/schedule.module';
+import { TokenModule } from './token/token.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { ScheduleAppModule } from './schedule/schedule.module';
     NotesModule,
     NotificationModule,
     ScheduleAppModule,
+    TokenModule,
   ],
 })
 export class AppModule {}
