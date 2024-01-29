@@ -50,6 +50,7 @@ model NoteCategories {
 }
 
 model Tokens {
+  id     Int    @id @default(autoincrement())
   token  String @unique
   userId Int
   user   Users  @relation(fields: [userId], references: [id])

@@ -102,33 +102,111 @@ export class NotificationService {
     });
   }
 
-  async sendingNotificationOneUser(token: string) {
-    const payload = {
-      token: token,
-      notification: {
-        title: 'Hi there this is title',
-        body: 'Hi there this is message',
-      },
-      data: {
-        name: 'Joe',
-        age: '21',
-      },
-    };
+  async removeToken(
+    userId: number,
+    tokenId: number,
+  ): Promise<{ success: boolean; message?: string }> {
+    const token = await this.prisma.tokens.findUnique({
+      where: { id: tokenId, userId },
+    });
+
+    if (!token) {
+      throw new NotFoundException(
+        `Token with ID ${tokenId} not found or does not belong to the user.`,
+      );
+    }
 
     try {
-      const response = await admin.messaging().send(payload);
-      console.log('Firebase Cloud Messaging response:', response);
-
-      return {
-        success: true,
-        response,
-      };
+      await this.prisma.tokens.delete({ where: { id: tokenId } });
+      return { success: true, message: 'Token removed successfully.' };
     } catch (error) {
-      console.error('Firebase Cloud Messaging error:', error);
-      return {
-        success: false,
-        error,
-      };
+      throw new BadRequestException('Failed to remove token.');
     }
   }
+
+  async checkAndSendNotifications() {
+    const currentDateTime = new Date();
+    const warsawTime = currentDateTime.getTime() + 60 * 60 * 1000;
+
+    const reminders = await this.prisma.reminders.findMany({
+      where: {
+        date: {
+          gte: new Date(warsawTime - 60000),
+          lte: new Date(warsawTime + 60000),
+        },
+      },
+      include: {
+        user: true,
+        note: {
+          select: {
+            title: true,
+          },
+        },
+      },
+    });
+
+    for (const reminder of reminders) {
+      const { userId, noteId, note } = reminder;
+
+      console.log(reminder);
+
+      // Pobierz tokeny użytkownika z tabeli Tokens
+      const tokens = await this.prisma.tokens.findMany({
+        where: {
+          userId,
+        },
+      });
+
+      // Wyślij powiadomienie do każdego tokenu
+      for (const token of tokens) {
+        const payload = {
+          token: token.token,
+          notification: {
+            title: `Reminder: ${note.title}`,
+            body: `Pamiętaj o ${note.title}`,
+          },
+          data: {
+            noteId: noteId.toString(),
+          },
+        };
+
+        try {
+          const response = await admin.messaging().send(payload);
+          console.log('Firebase Cloud Messaging response:', response);
+        } catch (error) {
+          console.error('Firebase Cloud Messaging error:', error);
+        }
+      }
+    }
+  }
+
+  //   async sendingNotificationOneUser(token: string) {
+  //     const payload = {
+  //       token: token,
+  //       notification: {
+  //         title: 'Hi there this is title',
+  //         body: 'Hi there this is message',
+  //       },
+  //       data: {
+  //         name: 'Joe',
+  //         age: '21',
+  //       },
+  //     };
+
+  //     try {
+  //       const response = await admin.messaging().send(payload);
+  //       console.log('Firebase Cloud Messaging response:', response);
+
+  //       return {
+  //         success: true,
+  //         response,
+  //       };
+  //     } catch (error) {
+  //       console.error('Firebase Cloud Messaging error:', error);
+  //       return {
+  //         success: false,
+  //         error,
+  //       };
+  //     }
+  //   }
 }

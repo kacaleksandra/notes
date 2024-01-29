@@ -108,8 +108,39 @@ export class NotificationController {
     const { token } = body;
     return await this.notificationService.saveToken(user.id, token);
   }
+
+  @Delete('token/:tokenId')
+  @ApiOperation({
+    summary: 'Remove FCM Token',
+    description:
+      'Remove the Firebase Cloud Messaging (FCM) token for notifications.',
+  })
+  @ApiParam({
+    name: 'tokenId',
+    description: 'ID of the FCM token to be removed',
+    type: Number,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Token removed successfully.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad Request.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Not Found: Token not found or does not belong to the user.',
+  })
+  async removeToken(
+    @User() user: Users,
+    @Param('tokenId', ParseIntPipe) tokenId: number,
+  ) {
+    return this.notificationService.removeToken(user.id, tokenId);
+  }
+
+  // async sendingNotificationOneUser(@Body() body: { token: string }) {
+  //   const { token } = body;
+  //   return this.notificationService.sendingNotificationOneUser(token);
+  // }
 }
-// async sendingNotificationOneUser(@Body() body: { token: string }) {
-//   const { token } = body;
-//   return this.notificationService.sendingNotificationOneUser(token);
-// }
