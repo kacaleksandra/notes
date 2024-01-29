@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthEntity } from './entity/auth.entity';
 import { LoginDto } from './dto/login.dto';
 import { AuthService } from './auth.service';
@@ -11,6 +11,10 @@ export class AuthController {
 
   @Post('login')
   @ApiOkResponse({ type: AuthEntity })
+  @ApiOperation({
+    summary: 'Login',
+    description: 'Login with email and password and get access token',
+  })
   login(@Body() { email, password }: LoginDto) {
     return this.authService.login(email, password);
   }

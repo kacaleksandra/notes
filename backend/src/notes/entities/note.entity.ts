@@ -13,8 +13,6 @@ export class NoteEntity implements Notes {
   @ApiProperty()
   content: string;
   @ApiProperty()
-  categoryId: number;
-  @ApiProperty()
   created_at: Date;
   @Exclude()
   userId: number;

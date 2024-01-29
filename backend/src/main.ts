@@ -12,7 +12,14 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Notes app')
     .setVersion('1.0')
-    .addBearerAuth()
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'access-token',
+    )
     .addTag('notes')
     .build();
   const document = SwaggerModule.createDocument(app, config);
