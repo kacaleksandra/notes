@@ -15,6 +15,8 @@ model Users {
   password   String
   notes      Notes[]
   categories Categories[]
+  Tokens     Tokens[]
+  Reminders  Reminders[]
 }
 
 model Categories {
@@ -35,6 +37,7 @@ model Notes {
   user           Users            @relation(fields: [userId], references: [id])
   categories     Categories[]
   NoteCategories NoteCategories[]
+  Reminders      Reminders[]
 }
 
 model NoteCategories {
@@ -44,4 +47,19 @@ model NoteCategories {
   category   Categories @relation(fields: [categoryId], references: [id])
 
   @@id([noteId, categoryId])
+}
+
+model Tokens {
+  token  String @unique
+  userId Int
+  user   Users  @relation(fields: [userId], references: [id])
+}
+
+model Reminders {
+  id     Int      @id @default(autoincrement())
+  date   DateTime
+  userId Int
+  noteId Int
+  user   Users    @relation(fields: [userId], references: [id])
+  note   Notes    @relation(fields: [noteId], references: [id])
 }

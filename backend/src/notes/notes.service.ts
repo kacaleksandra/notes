@@ -136,10 +136,13 @@ export class NotesService {
     }
   }
 
-  async remove(userId: number, id: number) {
+  async remove(
+    userId: number,
+    id: number,
+  ): Promise<{ success: boolean; message?: string }> {
     const note = await this.prisma.notes.findUnique({
       where: { id, userId },
-      include: { NoteCategories: true }, // Pobieramy powiązane kategorie
+      include: { NoteCategories: true, Reminders: true }, // Pobieramy powiązane kategorie
     });
 
     if (!note) {
@@ -158,8 +161,16 @@ export class NotesService {
         });
       }
 
+      if (note.Reminders.length > 0) {
+        await this.prisma.reminders.deleteMany({
+          where: { noteId: id },
+        });
+      }
+
       // Usuwamy notatkę
       await this.prisma.notes.delete({ where: { id } });
+
+      return { success: true, message: 'Note removed successfully.' };
     } catch (error) {
       throw new InternalServerErrorException('Failed to delete note');
     }

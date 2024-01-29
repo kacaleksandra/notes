@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
   Param,
   ParseIntPipe,
   Patch,
@@ -77,7 +76,6 @@ export class NotesController {
   }
 
   @Delete(':id')
-  @HttpCode(204)
   @ApiOperation({
     summary: 'Delete note by id',
     description: 'Delete a note by id.',
@@ -93,7 +91,7 @@ export class NotesController {
     description: 'Internal Server Error: Failed to delete note',
   })
   async remove(@User() user: Users, @Param('id', ParseIntPipe) id: number) {
-    await this.notesService.remove(user.id, id);
+    return await this.notesService.remove(user.id, id);
   }
 
   @Get()
