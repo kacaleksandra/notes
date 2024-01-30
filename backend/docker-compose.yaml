@@ -2,28 +2,25 @@ version: '3.8'
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     depends_on:
-      - postgres
-    # Required because sometimes database container starts too late and app
-    # container dies
+      - database
+    # Required because sometimes database container starts too late and app container dies
     restart: on-failure:10
     ports:
       - 3000:3000
     environment:
-      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
       PROJECT_ID: ${PROJECT_ID}
       CLIENT_EMAIL: ${CLIENT_EMAIL}
       PRIVATE_KEY: ${PRIVATE_KEY}
 
-  postgres:
-    image: postgres:latest
+  database:
+    image: postgres:16.1-alpine
     environment:
-      POSTGRES_USER: prisma
-      POSTGRES_PASSWORD: prisma123
-      POSTGRES_DB: notes
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - 5432:5432
