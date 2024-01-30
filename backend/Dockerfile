@@ -33,4 +33,5 @@ EXPOSE 3000
 #Start simple init system
 ENTRYPOINT ["dumb-init", "--"]
 #Migrate for database and start app
-CMD ["bash", "-c", "npx prisma migrate deploy && node dist/src/main"]
+CMD ["npx", "prisma", "migrate", "deploy"]
+CMD ["node","dist/src/main"]
