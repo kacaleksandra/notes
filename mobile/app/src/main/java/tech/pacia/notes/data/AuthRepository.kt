@@ -1,8 +1,5 @@
 package tech.pacia.notes.data
 
-import retrofit2.HttpException
-import retrofit2.Response
-
 data class User(
     val email: String,
     val accessToken: String,
@@ -55,21 +52,4 @@ class AuthRepository(
     }
 
     suspend fun signOut() = tokenStore.clearToken()
-
-    @Suppress("TooGenericExceptionCaught")
-    private suspend fun <T : Any> callSafely(apiMethod: suspend () -> Response<T>): NetworkResult<T> {
-        return try {
-            val response = apiMethod()
-            val body = response.body()
-            if (response.isSuccessful && body != null) {
-                Success(body)
-            } else {
-                Error(code = response.code(), message = response.message())
-            }
-        } catch (e: HttpException) {
-            Error(code = e.code(), message = e.message())
-        } catch (e: Throwable) {
-            Exception(e)
-        }
-    }
 }

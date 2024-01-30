@@ -14,7 +14,6 @@ import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
-import java.util.Locale.Category
 
 /** REQUESTS **/
 
@@ -64,7 +63,7 @@ interface NotesApi {
     suspend fun readNotes(): Response<List<Note>>
 
     @GET("notes/{id}")
-    suspend fun readNote(@Path("id") id: String): Response<Unit>
+    suspend fun readNote(@Path("id") id: String): Response<Note>
 
     @PATCH
     suspend fun updateNote(@Body note: UpsertNoteRequest): Response<Unit>
@@ -75,7 +74,7 @@ interface NotesApi {
     /** CATEGORIES **/
 
     @POST("categories")
-    suspend fun createCategory(@Body note: CreateCategoryRequest)
+    suspend fun createCategory(@Body note: CreateCategoryRequest): Response<Unit>
 
     @GET("categories")
     suspend fun readCategories(): Response<List<Category>>
