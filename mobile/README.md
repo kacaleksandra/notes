@@ -18,6 +18,8 @@ _Started on Monday, 12th August 2019 (Flutter version)_
 
 Notes is simple app for note-taking and remembering things
 
+![demo](./demo.png)
+
 **Features**
 
 - create account and sign in
