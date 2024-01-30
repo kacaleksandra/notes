@@ -78,7 +78,7 @@ export class NotesService {
   async update(userId: number, id: number, updateNoteDto: CreateNoteDto) {
     const note = await this.prisma.notes.findUnique({
       where: { id, userId },
-      include: { NoteCategories: true }, // Pobieramy powiązane kategorie
+      include: { NoteCategories: true },
     });
 
     if (!note) {
@@ -90,7 +90,6 @@ export class NotesService {
     }
 
     try {
-      // Aktualizujemy notatkę (bez uwzględniania categoryId)
       const updatedNote = await this.prisma.notes.update({
         where: { id },
         data: {
@@ -99,17 +98,14 @@ export class NotesService {
         },
       });
 
-      // Jeśli przesłano categoryId, to aktualizujemy wpis w tabeli pośredniczącej
       if (
         updateNoteDto.categoryIds !== undefined &&
         updateNoteDto.categoryIds.length > 0
       ) {
-        // Usuwamy poprzednie wpisy w tabeli pośredniczącej
         await this.prisma.noteCategories.deleteMany({
           where: { noteId: id },
         });
 
-        // Dodajemy nowy wpis w tabeli pośredniczącej
         for (const categoryId of updateNoteDto.categoryIds) {
           await this.prisma.noteCategories.create({
             data: {
@@ -119,7 +115,6 @@ export class NotesService {
           });
         }
       } else {
-        // Jeśli categoryId nie jest przesłane, usuwamy wszelkie powiązania w tabeli pośredniczącej
         await this.prisma.noteCategories.deleteMany({
           where: { noteId: id },
         });
@@ -142,7 +137,7 @@ export class NotesService {
   ): Promise<{ success: boolean; message?: string }> {
     const note = await this.prisma.notes.findUnique({
       where: { id, userId },
-      include: { NoteCategories: true, Reminders: true }, // Pobieramy powiązane kategorie
+      include: { NoteCategories: true, Reminders: true },
     });
 
     if (!note) {
@@ -154,7 +149,6 @@ export class NotesService {
     }
 
     try {
-      // Usuwamy powiązania z tabeli pośredniczącej, jeśli istnieją
       if (note.NoteCategories.length > 0) {
         await this.prisma.noteCategories.deleteMany({
           where: { noteId: id },
@@ -167,7 +161,6 @@ export class NotesService {
         });
       }
 
-      // Usuwamy notatkę
       await this.prisma.notes.delete({ where: { id } });
 
       return { success: true, message: 'Note removed successfully.' };

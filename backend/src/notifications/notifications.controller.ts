@@ -7,7 +7,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { NotificationService } from './notification.service';
+import { NotificationsService } from './notifications.service';
 import {
   ApiTags,
   ApiBearerAuth,
@@ -22,12 +22,12 @@ import { User } from 'common/decorators/user.decorator';
 import { Users } from '@prisma/client';
 import { AddReminderDto } from './dto/add-reminder.dto';
 
-@Controller('notification')
+@Controller('notifications')
 @ApiTags('notifications')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('access-token')
-export class NotificationController {
-  constructor(private readonly notificationService: NotificationService) {}
+export class NotificationsController {
+  constructor(private readonly notificationsService: NotificationsService) {}
 
   @Post()
   @ApiOperation({
@@ -49,7 +49,7 @@ export class NotificationController {
     description: 'Conflict: Reminder already exists.',
   })
   async addReminder(@User() user: Users, @Body() body: AddReminderDto) {
-    return await this.notificationService.addReminder(user.id, body);
+    return await this.notificationsService.addReminder(user.id, body);
   }
 
   @Delete(':reminderId')
@@ -79,11 +79,6 @@ export class NotificationController {
     @User() user: Users,
     @Param('reminderId', ParseIntPipe) reminderId: number,
   ) {
-    return this.notificationService.removeReminder(user.id, reminderId);
+    return this.notificationsService.removeReminder(user.id, reminderId);
   }
-
-  // async sendingNotificationOneUser(@Body() body: { token: string }) {
-  //   const { token } = body;
-  //   return this.notificationService.sendingNotificationOneUser(token);
-  // }
 }

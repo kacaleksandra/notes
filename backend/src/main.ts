@@ -7,7 +7,7 @@ import { setupRedoc } from 'common/middlewares/redoc.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors(); //public api, we open for everyone
+  app.enableCors(); //public api, opened to everyone
   app.setGlobalPrefix('api');
   const config = new DocumentBuilder()
     .setTitle('Notes app')
