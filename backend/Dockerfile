@@ -12,10 +12,16 @@ RUN npm install
 
 COPY . .
 
+#Build app
 RUN npm run build
 
 FROM node:20
 
+#Prepare required packages
+RUN apt-get update
+RUN apt-get install dumb-init
+
+#Copy built files to target image
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/dist ./dist
@@ -23,4 +29,8 @@ COPY --from=builder /app/tsconfig.json ./
 COPY --from=builder /app/prisma ./prisma
 
 EXPOSE 3000
-CMD npx prisma migrate deploy && npm run start:dev
+
+#Start simple init system
+ENTRYPOINT ["dumb-init", "--"]
+#Migrate for database and start app
+CMD ["bash", "-c", "npx prisma migrate deploy && node dist/src/main"]
