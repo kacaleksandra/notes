@@ -16,7 +16,7 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - postgres
-    #required because sometimes database container starts too late and app container dies because of it
+    #required because sometimes database container starts too late and app container dies
     restart: on-failure:10
     ports:
       - '3000:3000'
