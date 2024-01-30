@@ -20,7 +20,7 @@ import {
 import { Users } from '@prisma/client';
 import { User } from 'common/decorators/user.decorator';
 import { JwtAuthGuard } from 'src/auth/jwt-auth-guard';
-import { AddTokenDto } from 'src/notification/dto/add-token.dto';
+import { AddTokenDto } from 'src/notifications/dto/add-token.dto';
 
 @Controller('token')
 @ApiTags('tokens')

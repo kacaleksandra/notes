@@ -1,4 +1,3 @@
-// categories.controller.ts (przykład użycia w kontrolerze)
 import {
   Controller,
   Post,

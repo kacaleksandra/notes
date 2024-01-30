@@ -1,4 +1,3 @@
-// src/users/users.service.ts
 import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PrismaClient } from '@prisma/client';

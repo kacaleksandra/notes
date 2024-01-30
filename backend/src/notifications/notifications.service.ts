@@ -20,7 +20,7 @@ const firebaseConfig = {
 admin.initializeApp(firebaseConfig);
 
 @Injectable()
-export class NotificationService {
+export class NotificationsService {
   constructor(private readonly prisma: PrismaClient) {}
 
   async addReminder(
@@ -85,45 +85,6 @@ export class NotificationService {
     }
   }
 
-  async saveToken(userId: number, token: string) {
-    const existingToken = await this.prisma.tokens.findUnique({
-      where: { token },
-    });
-
-    if (existingToken) {
-      throw new BadRequestException('Token already exists.');
-    }
-
-    return await this.prisma.tokens.create({
-      data: {
-        token,
-        userId,
-      },
-    });
-  }
-
-  async removeToken(
-    userId: number,
-    tokenId: number,
-  ): Promise<{ success: boolean; message?: string }> {
-    const token = await this.prisma.tokens.findUnique({
-      where: { id: tokenId, userId },
-    });
-
-    if (!token) {
-      throw new NotFoundException(
-        `Token with ID ${tokenId} not found or does not belong to the user.`,
-      );
-    }
-
-    try {
-      await this.prisma.tokens.delete({ where: { id: tokenId } });
-      return { success: true, message: 'Token removed successfully.' };
-    } catch (error) {
-      throw new BadRequestException('Failed to remove token.');
-    }
-  }
-
   async checkAndSendNotifications() {
     const currentDateTime = new Date();
     const warsawTime = currentDateTime.getTime() + 60 * 60 * 1000;
@@ -150,14 +111,13 @@ export class NotificationService {
 
       console.log(reminder);
 
-      // Pobierz tokeny użytkownika z tabeli Tokens
       const tokens = await this.prisma.tokens.findMany({
         where: {
           userId,
         },
       });
 
-      // Wyślij powiadomienie do każdego tokenu
+      // send notification to every token for the user
       for (const token of tokens) {
         const payload = {
           token: token.token,
@@ -179,34 +139,4 @@ export class NotificationService {
       }
     }
   }
-
-  //   async sendingNotificationOneUser(token: string) {
-  //     const payload = {
-  //       token: token,
-  //       notification: {
-  //         title: 'Hi there this is title',
-  //         body: 'Hi there this is message',
-  //       },
-  //       data: {
-  //         name: 'Joe',
-  //         age: '21',
-  //       },
-  //     };
-
-  //     try {
-  //       const response = await admin.messaging().send(payload);
-  //       console.log('Firebase Cloud Messaging response:', response);
-
-  //       return {
-  //         success: true,
-  //         response,
-  //       };
-  //     } catch (error) {
-  //       console.error('Firebase Cloud Messaging error:', error);
-  //       return {
-  //         success: false,
-  //         error,
-  //       };
-  //     }
-  //   }
 }
