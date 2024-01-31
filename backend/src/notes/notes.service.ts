@@ -15,6 +15,15 @@ import { NoteEntity } from './entities/note.entity';
 export class NotesService {
   constructor(private prisma: PrismaClient) {}
 
+  private formatNote(note: any) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { NoteCategories, userId: noteUserId, ...rest } = note;
+    return {
+      ...rest,
+      categories: NoteCategories.map((category) => category.categoryId),
+    };
+  }
+
   async create(userId: number, createNoteDto: CreateNoteDto) {
     isUserExist(this.prisma, userId);
 
@@ -170,10 +179,14 @@ export class NotesService {
   }
 
   async findAll(userId: number) {
-    return this.prisma.notes.findMany({
+    const notes = await this.prisma.notes.findMany({
       where: { userId },
-      include: { NoteCategories: true },
+      include: { NoteCategories: { select: { categoryId: true } } },
     });
+
+    const formattedNotes = notes.map((note) => this.formatNote(note));
+
+    return formattedNotes;
   }
 
   async findOne(userId: number, id: number) {
@@ -186,15 +199,14 @@ export class NotesService {
       throw new NotFoundException('Note not found');
     }
 
-    return note;
+    const formattedNote = this.formatNote(note);
+    return formattedNote;
   }
 
   async findAllByCategory(userId: number, categoryId: number) {
     const category = await this.prisma.categories.findUnique({
       where: { id: categoryId, userId },
     });
-
-    console.log(category);
 
     if (!category) {
       throw new NotFoundException(
