@@ -49,7 +49,7 @@ data class Note(
     @SerialName("created_at") val createdAt: String, // TODO: Respect timezones
     val id: Int,
     val title: String,
-    val categoryIds: List<Int>,
+    @SerialName("categories") val categoryIds: List<Int>,
 )
 
 @Serializable
