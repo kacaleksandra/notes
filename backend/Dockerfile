@@ -13,7 +13,7 @@ COPY common ./common
 RUN npm ci
 RUN npm run build
 
-FROM node:20-alpine
+FROM node:20-alpine AS runtime
 
 # Install required packages
 RUN apk update update
