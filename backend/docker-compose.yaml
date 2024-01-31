@@ -1,28 +1,31 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:latest
-    environment:
-      POSTGRES_USER: 'prisma'
-      POSTGRES_PASSWORD: 'prisma123'
-      POSTGRES_DB: 'notes'
-    ports:
-      - '5432:5432'
-
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     depends_on:
-      - postgres
-    #required because sometimes database container starts too late and app container dies
+      - database
+    # Required because sometimes database container starts too late and app container dies
     restart: on-failure:10
     ports:
-      - '3000:3000'
+      - 3000:3000
     environment:
-      DATABASE_URL: 'postgresql://prisma:prisma123@postgres:5432/notes'
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
       PROJECT_ID: ${PROJECT_ID}
       CLIENT_EMAIL: ${CLIENT_EMAIL}
       PRIVATE_KEY: ${PRIVATE_KEY}
+
+  database:
+    image: postgres:16.1-alpine
+    volumes:
+      - notes-postgres-data:/var/lib/mysql
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - 5432:5432
+
+volumes:
+  notes-postgres-data:
