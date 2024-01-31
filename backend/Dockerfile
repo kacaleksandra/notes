@@ -3,29 +3,25 @@ FROM node:20-alpine AS builder
 # Create app directory
 WORKDIR /app
 
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-COPY package*.json ./
-COPY prisma ./prisma/
+# Copy only the required source files needed for build
+COPY package.json package-lock.json tsconfig.json ./
+COPY prisma ./prisma
+COPY src ./src
+COPY common ./common
 
-# Install app dependencies
-RUN npm install
-
-COPY . .
-
-# Build app
+# Install dependencies and build app
+RUN npm ci
 RUN npm run build
 
 FROM node:20-alpine
 
 # Install required packages
-RUN apt-get update
-RUN apt-get install dumb-init
+RUN apk update update
+RUN apk add dumb-init
 
 # Copy built files to target image
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/tsconfig.json ./
 COPY --from=builder /app/prisma ./prisma
 
 EXPOSE 3000
@@ -34,4 +30,4 @@ EXPOSE 3000
 ENTRYPOINT ["dumb-init", "--"]
 
 # Initialize database configuration (in node_modules/.prisma) and start app
-CMD ["bash", "-c", "npx prisma migrate deploy && node dist/src/main"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/main"]
