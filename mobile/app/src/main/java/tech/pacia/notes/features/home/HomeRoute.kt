@@ -6,7 +6,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun HomeRoute(
-    onNavigateToNote: (noteId: String) -> Unit,
+    onNavigateToNote: (noteId: Int) -> Unit,
     onSignOut: () -> Unit,
 ) {
     val homeViewModel = viewModel(

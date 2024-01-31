@@ -49,10 +49,10 @@ import tech.pacia.notes.ui.theme.NotesTheme
 fun HomeScreen(
     modifier: Modifier = Modifier,
     uiState: NotesState,
-    onNavigateToNote: (noteId: String) -> Unit = {},
+    onNavigateToNote: (noteId: Int) -> Unit = {},
     onDeleteSelectedNotes: () -> Unit = {},
-    onSelectNote: (noteId: String) -> Unit = {},
-    onSelectCategory: (category: String) -> Unit = {},
+    onSelectNote: (noteId: Int) -> Unit = {},
+    onSelectCategory: (categoryId: Int) -> Unit = {},
     onRefresh: () -> Unit = {},
     onSignOut: () -> Unit = {},
 ) {
@@ -125,9 +125,9 @@ fun HomeScreen(
                 Spacer(modifier = Modifier)
                 for (category in uiState.categories) {
                     FilterChip(
-                        selected = uiState.selectedCategoryIds.contains(category),
-                        onClick = { onSelectCategory(category) },
-                        label = { Text(category) },
+                        selected = uiState.selectedCategoryIds.contains(category.id),
+                        onClick = { onSelectCategory(category.id) },
+                        label = { Text(category.title) },
                     )
                 }
                 Spacer(modifier = Modifier)
@@ -197,7 +197,7 @@ private fun appBarText(notesUiState: NotesState): String {
     }
 }
 
-@Preview(showSystemUi = true)
+/*@Preview(showSystemUi = true)
 @Composable
 fun HomeScreenPreview() {
     NotesTheme {
@@ -226,3 +226,4 @@ fun HomeScreenPreviewDark() {
         )
     }
 }
+ */

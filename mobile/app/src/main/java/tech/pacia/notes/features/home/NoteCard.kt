@@ -42,7 +42,7 @@ fun NoteCard(
     note: Note,
     onClick: () -> Unit = {},
     onSelect: () -> Unit = {},
-    onCategoryClick: ((categoryId: String) -> Unit)? = {},
+    onCategoryClick: ((categoryId: Int) -> Unit)? = {},
     selected: Boolean = false,
 ) {
     val borderColor by animateColorAsState(
@@ -77,10 +77,10 @@ fun NoteCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            FlowRow(
+            /*FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                for (category in note.categories) {
+                for (category in not) {
                     CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
                         FilterChip(
                             selected = true,
@@ -89,11 +89,12 @@ fun NoteCard(
                         )
                     }
                 }
-            }
+            }*/
         }
     }
 }
 
+/*
 @Preview(showBackground = true)
 @Composable
 fun NoteCardPreview() {
@@ -117,3 +118,4 @@ fun NoteCardPreviewDark() {
         NoteCard(note = NotesRepository.notes.last())
     }
 }
+*/

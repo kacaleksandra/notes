@@ -2,6 +2,7 @@ package tech.pacia.notes.data
 
 import android.util.Log
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -41,9 +42,19 @@ data class CreateCategoryRequest(
 )
 
 /** RESPONSES **/
+
+@Serializable
+data class Note(
+    val content: String,
+    @SerialName("created_at") val createdAt: String, // TODO: Respect timezones
+    val id: Int,
+    val title: String,
+    val categoryIds: List<Int>,
+)
+
 @Serializable
 data class Category(
-    val id: String,
+    val id: Int,
     val title: String,
 )
 
@@ -103,7 +114,11 @@ class NotesApiClient(
 
     private val httpClient: OkHttpClient = builder.build()
 
+    private val json: Json = Json {
+        ignoreUnknownKeys = true
+    }
+
     val webservice: NotesApi = Retrofit.Builder().baseUrl(url)
-        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+        .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
         .client(httpClient).build().create(NotesApi::class.java)
 }

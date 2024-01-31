@@ -22,8 +22,8 @@ sealed interface NotesState {
     data class Success(
         val notes: List<Note>,
         val categories: List<Category>,
-        val selectedCategoryIds: Set<String>,
-        val selectedNotesIds: Set<String>,
+        val selectedCategoryIds: Set<Int>,
+        val selectedNotesIds: Set<Int>,
     ) : NotesState {
 
         val selectedNotes: List<Note>
@@ -132,7 +132,7 @@ class HomeViewModel(private val notesRepository: NotesRepository) : ViewModel() 
         }
     }
 
-    fun selectNote(noteId: String) {
+    fun selectNote(noteId: Int) {
         val state = _uiState.value
         if (state !is NotesState.Success) return
 
@@ -147,7 +147,7 @@ class HomeViewModel(private val notesRepository: NotesRepository) : ViewModel() 
         }
     }
 
-    fun selectCategory(categoryId: String) {
+    fun selectCategory(categoryId: Int) {
         val state = _uiState.value
         if (state !is NotesState.Success) return
 

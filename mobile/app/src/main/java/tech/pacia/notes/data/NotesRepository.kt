@@ -2,15 +2,6 @@ package tech.pacia.notes.data
 
 import kotlinx.serialization.Serializable
 
-@Serializable
-data class Note(
-    val content: String,
-    val createdAt: String, // TODO: Respect timezones
-    val id: String,
-    val title: String,
-    val categoryIds: List<String>,
-)
-
 class NotesRepository(private val apiClient: NotesApi) {
 
     /** Notes **/
