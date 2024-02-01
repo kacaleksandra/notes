@@ -24,3 +24,5 @@ style:
       - 'Preview'
   ForbiddenComment:
     allowedPatterns: 'TODO:'
+  CascadingCallWrapping:
+    active: true

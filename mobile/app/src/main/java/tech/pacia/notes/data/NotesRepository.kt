@@ -1,7 +1,5 @@
 package tech.pacia.notes.data
 
-import kotlinx.serialization.Serializable
-
 class NotesRepository(private val apiClient: NotesApi) {
 
     /** Notes **/

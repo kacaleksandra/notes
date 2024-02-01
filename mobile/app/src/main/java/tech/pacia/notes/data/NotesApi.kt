@@ -100,16 +100,18 @@ class NotesApiClient(
 ) {
     private val builder: OkHttpClient.Builder = OkHttpClient.Builder().addInterceptor { chain ->
         val accessToken = tokenStore.accessToken()
+        Log.d("NotesApiClient", "access token: $accessToken")
+
         if (accessToken == null) {
-            Log.d("NotesApiClient", "accessToken is null")
-            chain.proceed(chain.request())
+            return@addInterceptor chain.proceed(chain.request())
         }
-        Log.d("NotesApiClient", "AccessToken: $accessToken")
 
-        val request =
-            chain.request().newBuilder().addHeader("Authorization", "Bearer $accessToken").build()
+        val request = chain.request()
+            .newBuilder()
+            .addHeader("Authorization", "Bearer $accessToken")
+            .build()
 
-        chain.proceed(request)
+        return@addInterceptor chain.proceed(request)
     }
 
     private val httpClient: OkHttpClient = builder.build()
@@ -120,5 +122,7 @@ class NotesApiClient(
 
     val webservice: NotesApi = Retrofit.Builder().baseUrl(url)
         .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-        .client(httpClient).build().create(NotesApi::class.java)
+        .client(httpClient)
+        .build()
+        .create(NotesApi::class.java)
 }
