@@ -8,10 +8,11 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import tech.pacia.notes.data.AuthRepository
 import tech.pacia.notes.data.Category
-import tech.pacia.notes.data.Note
 import tech.pacia.notes.data.NotesRepository
 import tech.pacia.notes.data.Success
+import tech.pacia.notes.globalAuthRepository
 import tech.pacia.notes.globalNotesRepository
 
 sealed interface NotesState {
@@ -20,18 +21,18 @@ sealed interface NotesState {
     data class Error(val message: String) : NotesState
 
     data class Success(
-        val notes: List<Note>,
+        val notes: List<DisplayNote>,
         val categories: List<Category>,
         val selectedCategoryIds: Set<Int>,
         val selectedNotesIds: Set<Int>,
     ) : NotesState {
 
-        val selectedNotes: List<Note>
+        val selectedNotes: List<DisplayNote>
             get() {
                 if (selectedCategoryIds.isEmpty()) return notes
 
                 return notes.filter { note ->
-                    note.categoryIds.any { selectedCategoryIds.contains(it) }
+                    note.categories.any { selectedCategoryIds.contains(it.id) }
                 }
             }
 
@@ -40,10 +41,22 @@ sealed interface NotesState {
     }
 }
 
+// Like a Note, but has an embedded category.
+data class DisplayNote(
+    val content: String,
+    val createdAt: String,
+    val id: Int,
+    val title: String,
+    val categories: List<Category>,
+)
+
 // TODO: Refactor NotesState to simple data class with properties like isRefreshing and isError.
 // No sealed classes are necessary since we'll simply listen to a flow from Room.
 
-class HomeViewModel(private val notesRepository: NotesRepository) : ViewModel() {
+class HomeViewModel(
+    private val notesRepository: NotesRepository,
+    private val authRepository: AuthRepository,
+) : ViewModel() {
     private val _uiState: MutableStateFlow<NotesState> = MutableStateFlow(NotesState.Loading)
     val uiState: StateFlow<NotesState> = _uiState
 
@@ -88,7 +101,18 @@ class HomeViewModel(private val notesRepository: NotesRepository) : ViewModel() 
             }
 
             val notes = when (val response = notesRepository.readNotes()) {
-                is Success -> response.data
+                is Success -> response.data.map {
+                    DisplayNote(
+                        content = it.content,
+                        createdAt = it.createdAt,
+                        id = it.id,
+                        title = it.title,
+                        categories = it.categoryIds.map { categoryId ->
+                            categories.single { category -> category.id == categoryId }
+                        },
+                    )
+                }
+
                 is tech.pacia.notes.data.Error -> {
                     Log.i(
                         this::class.simpleName,
@@ -122,13 +146,6 @@ class HomeViewModel(private val notesRepository: NotesRepository) : ViewModel() 
             } catch (exception: Exception) {
                 _uiState.value = NotesState.Error("Failed")
             }
-        }
-    }
-
-    fun deleteNote(noteId: String) {
-        viewModelScope.launch {
-            notesRepository.deleteNoteById(noteId)
-            refresh()
         }
     }
 
@@ -168,10 +185,16 @@ class HomeViewModel(private val notesRepository: NotesRepository) : ViewModel() 
 
         if (state.selectedNotesIds.isEmpty()) return
 
-        _uiState.value = state.copy(
-            notes = state.notes.filterNot { note -> state.selectedNotesIds.contains(note.id) },
-        )
+        viewModelScope.launch {
+            for (noteId in state.selectedNotesIds) {
+                notesRepository.deleteNoteById(noteId)
+            }
+
+            refresh()
+        }
     }
+
+    fun signOut() = viewModelScope.launch { authRepository.signOut() }
 
     companion object {
         val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
@@ -179,7 +202,10 @@ class HomeViewModel(private val notesRepository: NotesRepository) : ViewModel() 
             override fun <T : ViewModel> create(
                 modelClass: Class<T>,
                 extras: CreationExtras,
-            ): T = HomeViewModel(notesRepository = globalNotesRepository) as T
+            ): T = HomeViewModel(
+                notesRepository = globalNotesRepository,
+                authRepository = globalAuthRepository,
+            ) as T
         }
     }
 }

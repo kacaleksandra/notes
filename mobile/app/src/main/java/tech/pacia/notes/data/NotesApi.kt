@@ -74,13 +74,13 @@ interface NotesApi {
     suspend fun readNotes(): Response<List<Note>>
 
     @GET("notes/{id}")
-    suspend fun readNote(@Path("id") id: String): Response<Note>
+    suspend fun readNote(@Path("id") id: Int): Response<Note>
 
     @PATCH
     suspend fun updateNote(@Body note: UpsertNoteRequest): Response<Unit>
 
     @DELETE("notes/{id}")
-    suspend fun deleteNote(@Path("id") id: String): Response<Unit>
+    suspend fun deleteNote(@Path("id") id: Int): Response<Unit>
 
     /** CATEGORIES **/
 
@@ -91,7 +91,7 @@ interface NotesApi {
     suspend fun readCategories(): Response<List<Category>>
 
     @DELETE("categories/{id}")
-    suspend fun deleteCategory(@Path("id") id: String): Response<Unit>
+    suspend fun deleteCategory(@Path("id") id: Int): Response<Unit>
 }
 
 class NotesApiClient(

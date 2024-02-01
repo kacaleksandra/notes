@@ -123,16 +123,6 @@ fun SignInScreen(
             ) {
                 Text("Sign in")
             }
-
-//            Button(
-//                onClick = { onSignInSubmitted("bartek", "123") },
-//                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-//                modifier = Modifier
-//                    .fillMaxWidth(fraction = 0.75f)
-//                    .padding(8.dp),
-//            ) {
-//                Text("Sign in (debug)")
-//            }
         }
     }
 

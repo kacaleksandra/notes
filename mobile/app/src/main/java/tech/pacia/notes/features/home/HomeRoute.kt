@@ -23,6 +23,9 @@ fun HomeRoute(
         onSelectNote = homeViewModel::selectNote,
         onSelectCategory = homeViewModel::selectCategory,
         onRefresh = homeViewModel::refresh,
-        onSignOut = onSignOut,
+        onSignOut = {
+            homeViewModel.signOut()
+            onSignOut()
+        },
     )
 }

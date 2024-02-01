@@ -19,7 +19,7 @@ class NotesRepository(private val apiClient: NotesApi) {
         return callSafely { apiClient.readNotes() }
     }
 
-    suspend fun readNote(noteId: String): NetworkResult<Note> {
+    suspend fun readNote(noteId: Int): NetworkResult<Note> {
         return callSafely { apiClient.readNote(id = noteId) }
     }
 
@@ -35,7 +35,7 @@ class NotesRepository(private val apiClient: NotesApi) {
         }
     }
 
-    suspend fun deleteNoteById(noteId: String) {
+    suspend fun deleteNoteById(noteId: Int) {
         callSafely { apiClient.deleteNote(id = noteId) }
     }
 
@@ -51,7 +51,7 @@ class NotesRepository(private val apiClient: NotesApi) {
         return callSafely { apiClient.readCategories() }
     }
 
-    suspend fun deleteCategory(id: String) {
+    suspend fun deleteCategory(id: Int) {
         callSafely { apiClient.deleteCategory(id = id) }
     }
 }

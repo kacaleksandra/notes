@@ -1,5 +1,8 @@
 package tech.pacia.notes.data
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.runBlocking
+
 data class User(
     val email: String,
     val accessToken: String,
@@ -10,22 +13,23 @@ class AuthRepository(
     private val tokenStore: TokenStore,
 ) {
 
-    /*fun accessToken(): String? {
-        return runBlocking { dataStore.data.first()[PreferencesKeys.USER_ACCESS_TOKEN] }
-    }
+//    fun accessToken(): String? {
+//        return runBlocking { dataStore.data.first()[PreferencesKeys.USER_ACCESS_TOKEN] }
+//    }
 
+    fun accessToken(): Flow<String?> = tokenStore.accessTokenUpdates()
 
-    val userFlow: Flow<User?> = dataStore.data.map { preferences ->
-        val accessToken = preferences[PreferencesKeys.USER_ACCESS_TOKEN]
-        val email = preferences[PreferencesKeys.USER_EMAIL]
-        if (accessToken == null || email == null) {
-            return@map null
-        }
+    /* val userFlow: Flow<User?> = dataStore.data.map { preferences ->
+         val accessToken = preferences[PreferencesKeys.USER_ACCESS_TOKEN]
+         val email = preferences[PreferencesKeys.USER_EMAIL]
+         if (accessToken == null || email == null) {
+             return@map null
+         }
 
-        return@map User(
-            email = email, accessToken = accessToken
-        )
-    }*/
+         return@map User(
+             email = email, accessToken = accessToken
+         )
+     }*/
 
     suspend fun signUp(email: String, password: String): NetworkResult<Unit> {
         return callSafely {
