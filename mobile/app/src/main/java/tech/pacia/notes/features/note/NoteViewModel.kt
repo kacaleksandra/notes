@@ -1,5 +1,6 @@
 package tech.pacia.notes.features.note
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -7,8 +8,9 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import tech.pacia.notes.data.Note
 import tech.pacia.notes.data.NotesRepository
+import tech.pacia.notes.data.Success
+import tech.pacia.notes.features.home.DisplayNote
 import tech.pacia.notes.globalNotesRepository
 
 sealed interface NoteState {
@@ -17,8 +19,9 @@ sealed interface NoteState {
     data class Error(val message: String) : NoteState
 
     data class Success(
-        val title: List<Note>,
-        val content: Set<String>,
+        val title: String,
+        val content: String,
+        val createdAt: String,
         val categories: Set<String>,
     ) : NoteState
 }
@@ -27,7 +30,7 @@ sealed interface NoteState {
 // No sealed classes are necessary since we'll simply listen to a flow from Room.
 
 class NoteViewModel(
-    private val noteId: String?,
+    private val noteId: Int?,
     private val notesRepository: NotesRepository,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<NoteState> = MutableStateFlow(NoteState.Loading)
@@ -38,8 +41,102 @@ class NoteViewModel(
     }
 
     @Suppress("SwallowedException", "TooGenericExceptionCaught")
-    fun refresh() {
-        viewModelScope.launch {
+    fun refresh() = viewModelScope.launch {
+        val noteId = this@NoteViewModel.noteId
+        if (noteId == null) {
+            _uiState.value = NoteState.Success(
+                title = "My new note",
+                content = "Write here!",
+                categories = setOf(),
+                createdAt = "just now",
+            )
+            return@launch
+        }
+
+        _uiState.value = NoteState.Loading
+
+        val note = when (val response = notesRepository.readNote(noteId)) {
+            is Success ->
+                DisplayNote(
+                    content = response.data.content,
+                    createdAt = response.data.createdAt,
+                    id = response.data.id,
+                    title = response.data.title,
+                    categories = listOf(),
+                )
+
+            is tech.pacia.notes.data.Error -> {
+                Log.i(
+                    this::class.simpleName,
+                    "Failed to load note with id $noteId: ${response.code} ${response.message}",
+                )
+                _uiState.value = NoteState.Error(
+                    message = "Failed to load note with id $noteId - ${response.message} (${response.code}",
+                )
+                return@launch
+            }
+
+            is tech.pacia.notes.data.Exception -> {
+                Log.w(
+                    this::class.simpleName,
+                    "Unexpected exception while loading note with id $noteId: ${response.e}",
+                )
+                _uiState.value = NoteState.Error(
+                    message = "Failed to load note with id $noteId (unexpected exception)",
+                )
+                return@launch
+            }
+        }
+
+        _uiState.value = NoteState.Success(
+            title = note.title,
+            content = note.content,
+            categories = setOf(),
+            createdAt = note.createdAt,
+        )
+    }
+
+    fun onTitleEdited(newTitle: String) {
+        val state = _uiState.value
+        if (state !is NoteState.Success) return
+
+        _uiState.value = state.copy(title = newTitle)
+    }
+
+    fun onContentEdited(newContent: String) {
+        val state = _uiState.value
+        if (state !is NoteState.Success) return
+
+        _uiState.value = state.copy(content = newContent)
+    }
+
+    fun saveNote() = viewModelScope.launch {
+        val state = _uiState.value
+        if (state !is NoteState.Success) return@launch
+
+        if (noteId != null) {
+            notesRepository.updateNote(
+                id = noteId,
+                title = state.title,
+                content = state.content,
+                categoryIds = listOf(),
+            )
+        }
+    }
+
+    fun updateNote() = viewModelScope.launch {
+        val state = _uiState.value
+        if (state !is NoteState.Success) return@launch
+
+        if (noteId == null) {
+            notesRepository.createNote(title = state.title, content = state.content)
+        } else {
+            notesRepository.updateNote(
+                id = noteId,
+                title = state.title,
+                content = state.content,
+                categoryIds = listOf(),
+            )
         }
     }
 
@@ -52,7 +149,7 @@ class NoteViewModel(
                 modelClass: Class<T>,
                 extras: CreationExtras,
             ): T {
-                val noteId = extras[NOTE_ID_KEY]
+                val noteId = extras[NOTE_ID_KEY]?.toInt()
                 return NoteViewModel(noteId = noteId, notesRepository = globalNotesRepository) as T
             }
         }

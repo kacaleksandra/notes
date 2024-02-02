@@ -76,8 +76,8 @@ interface NotesApi {
     @GET("notes/{id}")
     suspend fun readNote(@Path("id") id: Int): Response<Note>
 
-    @PATCH
-    suspend fun updateNote(@Body note: UpsertNoteRequest): Response<Unit>
+    @PATCH("notes/{id}")
+    suspend fun updateNote(@Path("id") id: Int, @Body note: UpsertNoteRequest): Response<Unit>
 
     @DELETE("notes/{id}")
     suspend fun deleteNote(@Path("id") id: Int): Response<Unit>

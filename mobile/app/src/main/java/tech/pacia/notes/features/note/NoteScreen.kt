@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,8 +20,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import tech.pacia.notes.ui.theme.NotesTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,15 +31,25 @@ fun NoteScreen(
     modifier: Modifier = Modifier,
     title: String = "",
     content: String = "",
+    createdAt: String = "",
+    isNewNote: Boolean = false,
     onNavigateUp: () -> Unit = {},
-    onNoteEdited: (String) -> Unit = {},
+    onTitleEdited: (String) -> Unit = {},
+    onContentEdited: (String) -> Unit = { },
+    onNoteSaved: () -> Unit = {},
 ) {
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
                 title = {
-                    Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = title,
+                        onValueChange = onTitleEdited,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = { onNoteSaved() }),
+                    )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
@@ -54,15 +67,19 @@ fun NoteScreen(
                 .padding(paddingValues)
                 .fillMaxSize(),
         ) {
-            Text(
-                modifier = Modifier.align(Alignment.Center),
-                text = "NoteScreen",
-            )
-
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = content,
-                onValueChange = onNoteEdited,
+                onValueChange = onContentEdited,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { onNoteSaved() }),
+            )
+
+            Text(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 8.dp),
+                text = "Created $createdAt",
             )
         }
     }

@@ -136,16 +136,12 @@ class HomeViewModel(
                 }
             }
 
-            try {
-                _uiState.value = NotesState.Success(
-                    categories = categories,
-                    notes = notes,
-                    selectedCategoryIds = selectedCategories,
-                    selectedNotesIds = setOf(),
-                )
-            } catch (exception: Exception) {
-                _uiState.value = NotesState.Error("Failed")
-            }
+            _uiState.value = NotesState.Success(
+                categories = categories,
+                notes = notes,
+                selectedCategoryIds = selectedCategories,
+                selectedNotesIds = setOf(),
+            )
         }
     }
 

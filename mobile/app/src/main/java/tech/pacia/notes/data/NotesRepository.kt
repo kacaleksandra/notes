@@ -23,9 +23,10 @@ class NotesRepository(private val apiClient: NotesApi) {
         return callSafely { apiClient.readNote(id = noteId) }
     }
 
-    suspend fun updateNote(title: String, content: String, categoryIds: List<String>) {
+    suspend fun updateNote(id: Int, title: String, content: String, categoryIds: List<String>) {
         callSafely {
             apiClient.updateNote(
+                id = id,
                 UpsertNoteRequest(
                     title = title,
                     content = content,
