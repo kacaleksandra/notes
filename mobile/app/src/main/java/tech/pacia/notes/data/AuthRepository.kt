@@ -1,7 +1,6 @@
 package tech.pacia.notes.data
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.runBlocking
 
 data class User(
     val email: String,

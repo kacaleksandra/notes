@@ -1,7 +1,6 @@
 package tech.pacia.notes.features.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,7 +37,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @OptIn(
@@ -50,7 +48,7 @@ import androidx.compose.ui.unit.dp
 fun HomeScreen(
     modifier: Modifier = Modifier,
     uiState: NotesState,
-    onNavigateToNote: (noteId: Int) -> Unit = {},
+    onNavigateToNote: (noteId: Int?) -> Unit = {},
     onDeleteSelectedNotes: () -> Unit = {},
     onSelectNote: (noteId: Int) -> Unit = {},
     onSelectCategory: (categoryId: Int) -> Unit = {},
@@ -83,7 +81,7 @@ fun HomeScreen(
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { },
+                onClick = { onNavigateToNote(null) },
                 icon = { Icon(Icons.Filled.Edit, "Create note") },
                 text = { Text(text = "Create note") },
             )

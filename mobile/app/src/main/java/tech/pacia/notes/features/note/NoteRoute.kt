@@ -12,7 +12,7 @@ fun NoteRoute(
     id: Int?,
     onNavigateUp: () -> Unit,
 ) {
-    val homeViewModel: NoteViewModel = viewModel(
+    val noteViewModel: NoteViewModel = viewModel(
         modelClass = NoteViewModel::class.java,
         factory = NoteViewModel.Factory,
         extras = MutableCreationExtras().apply {
@@ -20,7 +20,7 @@ fun NoteRoute(
         },
     )
 
-    val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by noteViewModel.uiState.collectAsStateWithLifecycle()
 
     NoteScreen(
         title = when (val state = uiState) {
@@ -35,12 +35,16 @@ fun NoteRoute(
         },
         createdAt = when (val state = uiState) {
             is NoteState.Success -> state.createdAt
-            else -> ""
+            else -> null
+        },
+        isEdited = when (val state = uiState) {
+            is NoteState.Success -> state.isEdited
+            else -> false
         },
         isNewNote = id == null,
-        onTitleEdited = homeViewModel::onTitleEdited,
-        onContentEdited = homeViewModel::onContentEdited,
-        onNoteSaved = homeViewModel::saveNote,
+        onTitleEdited = noteViewModel::onTitleEdited,
+        onContentEdited = noteViewModel::onContentEdited,
+        onNoteSaved = noteViewModel::saveNote,
         onNavigateUp = onNavigateUp,
     )
 }

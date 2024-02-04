@@ -23,6 +23,7 @@ sealed interface NoteState {
         val content: String,
         val createdAt: String,
         val categories: Set<String>,
+        val isEdited: Boolean,
     ) : NoteState
 }
 
@@ -37,18 +38,19 @@ class NoteViewModel(
     val uiState: StateFlow<NoteState> = _uiState
 
     init {
-        refresh()
+        initialize()
     }
 
     @Suppress("SwallowedException", "TooGenericExceptionCaught")
-    fun refresh() = viewModelScope.launch {
+    fun initialize() = viewModelScope.launch {
         val noteId = this@NoteViewModel.noteId
         if (noteId == null) {
             _uiState.value = NoteState.Success(
-                title = "My new note",
-                content = "Write here!",
+                title = "",
+                content = "",
                 categories = setOf(),
                 createdAt = "just now",
+                isEdited = false,
             )
             return@launch
         }
@@ -93,6 +95,7 @@ class NoteViewModel(
             content = note.content,
             categories = setOf(),
             createdAt = note.createdAt,
+            isEdited = false,
         )
     }
 
@@ -100,14 +103,14 @@ class NoteViewModel(
         val state = _uiState.value
         if (state !is NoteState.Success) return
 
-        _uiState.value = state.copy(title = newTitle)
+        _uiState.value = state.copy(title = newTitle, isEdited = true)
     }
 
     fun onContentEdited(newContent: String) {
         val state = _uiState.value
         if (state !is NoteState.Success) return
 
-        _uiState.value = state.copy(content = newContent)
+        _uiState.value = state.copy(content = newContent, isEdited = true)
     }
 
     fun saveNote() = viewModelScope.launch {
@@ -121,18 +124,8 @@ class NoteViewModel(
                 content = state.content,
                 categoryIds = listOf(),
             )
-        }
-    }
-
-    fun updateNote() = viewModelScope.launch {
-        val state = _uiState.value
-        if (state !is NoteState.Success) return@launch
-
-        if (noteId == null) {
-            notesRepository.createNote(title = state.title, content = state.content)
         } else {
-            notesRepository.updateNote(
-                id = noteId,
+            notesRepository.createNote(
                 title = state.title,
                 content = state.content,
                 categoryIds = listOf(),
@@ -149,7 +142,7 @@ class NoteViewModel(
                 modelClass: Class<T>,
                 extras: CreationExtras,
             ): T {
-                val noteId = extras[NOTE_ID_KEY]?.toInt()
+                val noteId = extras[NOTE_ID_KEY]?.toIntOrNull()
                 return NoteViewModel(noteId = noteId, notesRepository = globalNotesRepository) as T
             }
         }

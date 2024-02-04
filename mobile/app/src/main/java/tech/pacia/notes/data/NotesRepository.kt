@@ -3,13 +3,13 @@ package tech.pacia.notes.data
 class NotesRepository(private val apiClient: NotesApi) {
 
     /** Notes **/
-    suspend fun createNote(title: String, content: String) {
+    suspend fun createNote(title: String, content: String, categoryIds: List<String>) {
         callSafely {
             apiClient.createNote(
                 UpsertNoteRequest(
                     title = title,
                     content = content,
-                    categoryIds = listOf(),
+                    categoryIds = categoryIds,
                 ),
             )
         }
