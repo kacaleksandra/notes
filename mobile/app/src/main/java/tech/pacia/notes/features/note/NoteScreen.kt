@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -26,7 +27,6 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -37,7 +37,6 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,9 +48,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import tech.pacia.notes.ui.theme.NotesTheme
-import java.time.LocalDateTime
+import java.text.SimpleDateFormat
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,7 +62,7 @@ fun NoteScreen(
     modifier: Modifier = Modifier,
     title: String = "",
     content: String = "",
-    createdAt: String? = null,
+    createdAt: Instant? = null,
     isEdited: Boolean = false,
     isNewNote: Boolean = false,
     onNavigateUp: () -> Unit = {},
@@ -73,16 +75,16 @@ fun NoteScreen(
     val timePickerState = rememberTimePickerState(
         initialHour = 21,
         initialMinute = 37,
+        is24Hour = true,
     )
 
     val selectedInstant: Instant? = if (datePickerState.selectedDateMillis == null) {
         null
     } else {
         val selectedTime = timePickerState.hour.hours + timePickerState.minute.minutes
-        Instant.fromEpochMilliseconds(datePickerState.selectedDateMillis!!) + selectedTime
+        val millis = 123.milliseconds
+        Instant.fromEpochMilliseconds(datePickerState.selectedDateMillis!!) + selectedTime + millis
     }
-
-    selectedInstant?.toString()
 
     var showExitDialog by remember { mutableStateOf(false) }
     var showDatePickerDialog by remember { mutableStateOf(false) }
@@ -148,27 +150,31 @@ fun NoteScreen(
             }
         },
         sheetContent = {
-            Row(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
+            Row(
+                modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 Icon(Icons.Default.DateRange, contentDescription = "Calendar icon")
+                Spacer(modifier = Modifier.size(4.dp))
                 Text(
                     if (selectedInstant == null) {
                         "No reminder set"
                     } else {
-                        "Reminder set at ${formatDate(selectedInstant)}"
+                        "Remind ${formatDate(selectedInstant)}"
                     },
                 )
-
                 Spacer(modifier = Modifier.weight(1f))
-
-                CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
-                    TextButton(onClick = { showDatePickerDialog = true }) {
-                        Text(if (selectedInstant == null) "Add reminder" else "Change reminder")
-                    }
+                TextButton(onClick = { showDatePickerDialog = true }) {
+                    Text(if (selectedInstant == null) "Add reminder" else "Change")
                 }
             }
 
-            Row(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
+            Row(
+                modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 Icon(Icons.Rounded.Menu, contentDescription = "Menu icon")
+                Spacer(modifier = Modifier.size(4.dp))
                 Text(text = "No categories set")
                 Spacer(modifier = Modifier.weight(1f))
                 TextButton(onClick = {
@@ -177,12 +183,17 @@ fun NoteScreen(
                 }
             }
 
-            Row(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
+            Row(
+                modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 Icon(Icons.Rounded.Info, contentDescription = "Info icon")
+                Spacer(modifier = Modifier.size(4.dp))
                 Text(text = "Created at")
                 Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.weight(1f))
                 if (createdAt != null) {
-                    Text(formatDate(Instant.parse(createdAt)))
+                    Text(formatDate(createdAt))
                 }
             }
         },
@@ -198,7 +209,7 @@ fun NoteScreen(
                     .heightIn(max = 568.0.dp),
             ) {
                 Column(
-                    horizontalAlignment = Alignment.End,
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     DatePicker(state = datePickerState)
 
@@ -223,14 +234,14 @@ fun NoteScreen(
                     .heightIn(max = 568.0.dp),
             ) {
                 Column(
-                    horizontalAlignment = Alignment.End,
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     TimePicker(state = timePickerState)
 
                     TextButton(onClick = {
-                        showTimePickerDialog = true
+                        showTimePickerDialog = false
                     }) {
-                        Text("Select time")
+                        Text("Complete")
                     }
                 }
             }
@@ -262,10 +273,12 @@ fun NoteScreen(
 
 private fun formatDate(instant: Instant): String {
     val dateSt = instant.toString()
-    val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
-    val formattedDate = LocalDateTime.parse(dateSt, dateFormatter)
-    return DateTimeFormatter.ofPattern("MMMM dd, yyyy | hh:mma")
-        .format(formattedDate) // August 04, 2017 | 6:39pm
+    val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
+    val formattedDate = dateFormatter.parse(dateSt).toInstant()
+    return DateTimeFormatter.ofPattern("MMMM dd | HH:mm")
+        .withZone(ZoneId.of("UTC"))
+        .format(formattedDate)
+    // August 04, 2017 | 6:39pm
 }
 
 @Preview(uiMode = UI_MODE_NIGHT_NO, showSystemUi = true)

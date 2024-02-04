@@ -8,6 +8,8 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import tech.pacia.notes.data.NotesRepository
 import tech.pacia.notes.data.Success
 import tech.pacia.notes.features.home.DisplayNote
@@ -21,7 +23,7 @@ sealed interface NoteState {
     data class Success(
         val title: String,
         val content: String,
-        val createdAt: String,
+        val createdAt: Instant?,
         val categories: Set<String>,
         val isEdited: Boolean,
     ) : NoteState
@@ -49,7 +51,7 @@ class NoteViewModel(
                 title = "",
                 content = "",
                 categories = setOf(),
-                createdAt = "just now",
+                createdAt = null,
                 isEdited = false,
             )
             return@launch
@@ -95,6 +97,7 @@ class NoteViewModel(
             content = note.content,
             categories = setOf(),
             createdAt = note.createdAt,
+            // createdAt = null, //
             isEdited = false,
         )
     }

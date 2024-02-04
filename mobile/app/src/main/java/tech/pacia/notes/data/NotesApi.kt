@@ -2,11 +2,13 @@ package tech.pacia.notes.data
 
 import android.util.Log
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import retrofit2.Converter
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.http.Body
@@ -46,7 +48,8 @@ data class CreateCategoryRequest(
 @Serializable
 data class Note(
     val content: String,
-    @SerialName("created_at") val createdAt: String, // TODO: Respect timezones
+    // kotlin.serialization automatically supports kotlinx.datetime
+    @SerialName("created_at") val createdAt: Instant,
     val id: Int,
     val title: String,
     @SerialName("categories") val categoryIds: List<Int>,

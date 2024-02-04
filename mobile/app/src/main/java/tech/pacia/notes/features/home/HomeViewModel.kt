@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 import tech.pacia.notes.data.AuthRepository
 import tech.pacia.notes.data.Category
 import tech.pacia.notes.data.NotesRepository
@@ -44,7 +45,7 @@ sealed interface NotesState {
 // Like a Note, but has an embedded category.
 data class DisplayNote(
     val content: String,
-    val createdAt: String,
+    val createdAt: Instant,
     val id: Int,
     val title: String,
     val categories: List<Category>,
@@ -104,6 +105,7 @@ class HomeViewModel(
                 is Success -> response.data.map {
                     DisplayNote(
                         content = it.content,
+                        // createdAt = it.createdAt.toString(),
                         createdAt = it.createdAt,
                         id = it.id,
                         title = it.title,
