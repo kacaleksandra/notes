@@ -9,10 +9,24 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
+import tech.pacia.notes.data.Category
 import tech.pacia.notes.data.NotesRepository
 import tech.pacia.notes.data.Success
 import tech.pacia.notes.features.home.DisplayNote
 import tech.pacia.notes.globalNotesRepository
+
+// Like a Category, but can be checked on or off.
+data class DisplayCategory(
+    val id: Int,
+    val title: String,
+    val selected: Boolean,
+) {
+    companion object {
+        fun fromCategory(category: Category): DisplayCategory {
+            return DisplayCategory(id = category.id, title = category.title, selected = false)
+        }
+    }
+}
 
 sealed interface NoteState {
     data object Loading : NoteState
@@ -23,7 +37,7 @@ sealed interface NoteState {
         val title: String,
         val content: String,
         val createdAt: Instant?,
-        val categories: Set<String>,
+        val categories: List<DisplayCategory>,
         val isEdited: Boolean,
     ) : NoteState
 }
@@ -49,7 +63,7 @@ class NoteViewModel(
             _uiState.value = NoteState.Success(
                 title = "",
                 content = "",
-                categories = setOf(),
+                categories = listOf(),
                 createdAt = null,
                 isEdited = false,
             )
@@ -58,6 +72,31 @@ class NoteViewModel(
 
         _uiState.value = NoteState.Loading
 
+        val categories = when (val response = notesRepository.readCategories()) {
+            is Success -> response.data
+            is tech.pacia.notes.data.Error -> {
+                Log.i(
+                    this::class.simpleName,
+                    "Failed to load categories: ${response.code} ${response.message}",
+                )
+                _uiState.value = NoteState.Error(
+                    message = "Failed to load categories - ${response.message} (${response.code}",
+                )
+                return@launch
+            }
+
+            is tech.pacia.notes.data.Exception -> {
+                Log.w(
+                    this::class.simpleName,
+                    "Unexpected exception while loading categories: ${response.e}",
+                )
+                _uiState.value = NoteState.Error(
+                    message = "Failed to load categories (unexpected exception)",
+                )
+                return@launch
+            }
+        }
+
         val note = when (val response = notesRepository.readNote(noteId)) {
             is Success ->
                 DisplayNote(
@@ -65,7 +104,9 @@ class NoteViewModel(
                     createdAt = response.data.createdAt,
                     id = response.data.id,
                     title = response.data.title,
-                    categories = listOf(),
+                    categories = categories.filter { category ->
+                        response.data.categoryIds.contains(category.id)
+                    },
                 )
 
             is tech.pacia.notes.data.Error -> {
@@ -94,9 +135,8 @@ class NoteViewModel(
         _uiState.value = NoteState.Success(
             title = note.title,
             content = note.content,
-            categories = setOf(),
+            categories = note.categories.map { DisplayCategory.fromCategory(it) },
             createdAt = note.createdAt,
-            // createdAt = null, //
             isEdited = false,
         )
     }

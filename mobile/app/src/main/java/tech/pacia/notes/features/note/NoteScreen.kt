@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -47,6 +49,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
+import tech.pacia.notes.data.Category
 import tech.pacia.notes.ui.theme.NotesTheme
 import java.text.SimpleDateFormat
 import java.time.ZoneId
@@ -63,10 +66,12 @@ fun NoteScreen(
     title: String = "",
     content: String = "",
     createdAt: Instant? = null,
+    categories: List<DisplayCategory> = listOf(),
     isEdited: Boolean = false,
     onNavigateUp: () -> Unit = {},
     onTitleEdited: (String) -> Unit = {},
     onContentEdited: (String) -> Unit = { },
+    onCategorySelectionToggle: (categoryId: Int) -> Unit = {},
     onNoteSaved: () -> Unit = {},
 ) {
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
@@ -88,6 +93,7 @@ fun NoteScreen(
     var showExitDialog by remember { mutableStateOf(false) }
     var showDatePickerDialog by remember { mutableStateOf(false) }
     var showTimePickerDialog by remember { mutableStateOf(false) }
+    var showCategoryPickerDialog by remember { mutableStateOf(false) }
 
     BottomSheetScaffold(
         scaffoldState = bottomSheetScaffoldState,
@@ -174,8 +180,7 @@ fun NoteScreen(
                 Spacer(modifier = Modifier.size(4.dp))
                 Text(text = "No categories set")
                 Spacer(modifier = Modifier.weight(1f))
-                TextButton(onClick = {
-                }) {
+                TextButton(onClick = { showCategoryPickerDialog = true }) {
                     Text("Set categories")
                 }
             }
@@ -238,6 +243,44 @@ fun NoteScreen(
                     TextButton(onClick = {
                         showTimePickerDialog = false
                     }) {
+                        Text("Complete")
+                    }
+                }
+            }
+        }
+    }
+
+    if (showCategoryPickerDialog) {
+        AlertDialog(
+//            icon = { Icon(Icons.Rounded.Menu, contentDescription = "Menu icon") },
+//            title = { Text(text = "Select categories") },
+//            text = { Text(text = "Are you sure you want to exit without saving changes?") },
+            onDismissRequest = { showCategoryPickerDialog = false },
+        ) {
+            Surface(
+                modifier = Modifier
+                    .requiredWidth(360.0.dp)
+                    .heightIn(max = 568.0.dp),
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text("Select categories for this note")
+
+                    for (category in categories) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(
+                                checked = category.selected,
+                                onCheckedChange = {
+                                    onCategorySelectionToggle(category.id)
+                                },
+                            )
+
+                            Text(category.title)
+                        }
+                    }
+
+                    TextButton(onClick = { showCategoryPickerDialog = false }) {
                         Text("Complete")
                     }
                 }
