@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.detekt)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.googleMobileServices)
 }
 
 android {
@@ -77,6 +78,8 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.activity.compose)
     implementation(libs.datastore)
+
+    // Compose
     implementation(platform(libs.compose.bom))
     implementation(libs.ui)
     implementation(libs.ui.graphics)
@@ -84,6 +87,11 @@ dependencies {
     implementation(libs.material2)
     implementation(libs.material3)
     implementation(libs.androidx.navigation.compose)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.cloud.messaging)
+
     implementation(libs.kotlinx.datetime)
 
     implementation(libs.bundles.retrofit)

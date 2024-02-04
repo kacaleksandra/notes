@@ -20,7 +20,7 @@ class ExampleUnitTest {
         println(
             DateTimeFormatter.ofPattern("MMMM dd, yyyy | hh:mma")
                 .withZone(ZoneId.of("UTC"))
-                .format(formattedDate)
+                .format(formattedDate),
         )
     }
 }
