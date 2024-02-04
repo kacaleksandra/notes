@@ -42,6 +42,12 @@ data class CreateCategoryRequest(
     val title: String,
 )
 
+@Serializable
+data class CreateNotificationRequest(
+    val date: Instant,
+    val noteId: Int,
+)
+
 /** RESPONSES **/
 
 @Serializable
@@ -94,6 +100,14 @@ interface NotesApi {
 
     @DELETE("categories/{id}")
     suspend fun deleteCategory(@Path("id") id: Int): Response<Unit>
+
+    /** NOTIFICATIONS **/
+
+    @POST("notifications")
+    suspend fun createNotification(@Body notification: CreateNotificationRequest): Response<Unit>
+
+    @DELETE("notifications/{id}")
+    suspend fun deleteNotification(@Path("id") id: Int): Response<Unit>
 }
 
 class NotesApiClient(

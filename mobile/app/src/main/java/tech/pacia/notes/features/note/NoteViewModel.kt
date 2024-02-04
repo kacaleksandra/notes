@@ -11,9 +11,11 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import tech.pacia.notes.data.Category
 import tech.pacia.notes.data.NotesRepository
+import tech.pacia.notes.data.NotificationsRepository
 import tech.pacia.notes.data.Success
 import tech.pacia.notes.features.home.DisplayNote
 import tech.pacia.notes.globalNotesRepository
+import tech.pacia.notes.globalNotificationsRepository
 
 // Like a Category, but can be checked on or off.
 data class DisplayCategory(
@@ -48,6 +50,7 @@ sealed interface NoteState {
 class NoteViewModel(
     private val noteId: Int?,
     private val notesRepository: NotesRepository,
+    private val notificationsRepository: NotificationsRepository,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<NoteState> = MutableStateFlow(NoteState.Loading)
     val uiState: StateFlow<NoteState> = _uiState
@@ -177,6 +180,15 @@ class NoteViewModel(
         _uiState.value = state.copy(isEdited = false)
     }
 
+    fun createNotification(instant: Instant) = viewModelScope.launch {
+        val state = _uiState.value
+        if (state !is NoteState.Success) return@launch
+
+        if (noteId == null) return@launch
+
+        notificationsRepository.createNotification(noteId = noteId, date = instant)
+    }
+
     companion object {
         val NOTE_ID_KEY = object : CreationExtras.Key<String> {}
 
@@ -187,7 +199,11 @@ class NoteViewModel(
                 extras: CreationExtras,
             ): T {
                 val noteId = extras[NOTE_ID_KEY]?.toIntOrNull()
-                return NoteViewModel(noteId = noteId, notesRepository = globalNotesRepository) as T
+                return NoteViewModel(
+                    noteId = noteId,
+                    notesRepository = globalNotesRepository,
+                    notificationsRepository = globalNotificationsRepository,
+                ) as T
             }
         }
     }

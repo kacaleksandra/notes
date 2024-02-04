@@ -14,6 +14,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import tech.pacia.notes.data.AuthRepository
 import tech.pacia.notes.data.NotesApiClient
 import tech.pacia.notes.data.NotesRepository
+import tech.pacia.notes.data.NotificationsRepository
 import tech.pacia.notes.data.TokenStore
 import tech.pacia.notes.ui.theme.NotesTheme
 
@@ -26,6 +27,7 @@ private val Context.dataStore by preferencesDataStore(
 lateinit var globalDataStore: DataStore<Preferences>
 lateinit var globalAuthRepository: AuthRepository
 lateinit var globalNotesRepository: NotesRepository
+lateinit var globalNotificationsRepository: NotificationsRepository
 lateinit var globalTokenStore: TokenStore
 
 class MainActivity : ComponentActivity() {
@@ -47,6 +49,10 @@ class MainActivity : ComponentActivity() {
         )
 
         globalNotesRepository = NotesRepository(
+            apiClient = apiClient,
+        )
+
+        globalNotificationsRepository = NotificationsRepository(
             apiClient = apiClient,
         )
 

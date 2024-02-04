@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
@@ -49,7 +48,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
-import tech.pacia.notes.data.Category
 import tech.pacia.notes.ui.theme.NotesTheme
 import java.text.SimpleDateFormat
 import java.time.ZoneId
@@ -72,6 +70,7 @@ fun NoteScreen(
     onTitleEdited: (String) -> Unit = {},
     onContentEdited: (String) -> Unit = { },
     onCategorySelectionToggle: (categoryId: Int) -> Unit = {},
+    onCreateNotification: (time: Instant) -> Unit = {},
     onNoteSaved: () -> Unit = {},
 ) {
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
@@ -242,6 +241,8 @@ fun NoteScreen(
 
                     TextButton(onClick = {
                         showTimePickerDialog = false
+                        if (selectedInstant == null) return@TextButton
+                        onCreateNotification(selectedInstant)
                     }) {
                         Text("Complete")
                     }
@@ -252,9 +253,6 @@ fun NoteScreen(
 
     if (showCategoryPickerDialog) {
         AlertDialog(
-//            icon = { Icon(Icons.Rounded.Menu, contentDescription = "Menu icon") },
-//            title = { Text(text = "Select categories") },
-//            text = { Text(text = "Are you sure you want to exit without saving changes?") },
             onDismissRequest = { showCategoryPickerDialog = false },
         ) {
             Surface(
