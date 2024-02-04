@@ -48,6 +48,11 @@ data class CreateNotificationRequest(
     val noteId: Int,
 )
 
+@Serializable
+data class CreateTokenRequest(
+    val token: String,
+)
+
 /** RESPONSES **/
 
 @Serializable
@@ -108,6 +113,11 @@ interface NotesApi {
 
     @DELETE("notifications/{id}")
     suspend fun deleteNotification(@Path("id") id: Int): Response<Unit>
+
+    /** TOKENS **/
+
+    @POST("token")
+    suspend fun createToken(@Body token: CreateTokenRequest): Response<Unit>
 }
 
 class NotesApiClient(
