@@ -133,6 +133,8 @@ class NoteViewModel(
                 categoryIds = listOf(),
             )
         }
+
+        _uiState.value = state.copy(isEdited = false)
     }
 
     companion object {

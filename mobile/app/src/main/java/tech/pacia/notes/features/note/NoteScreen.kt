@@ -64,7 +64,6 @@ fun NoteScreen(
     content: String = "",
     createdAt: Instant? = null,
     isEdited: Boolean = false,
-    isNewNote: Boolean = false,
     onNavigateUp: () -> Unit = {},
     onTitleEdited: (String) -> Unit = {},
     onContentEdited: (String) -> Unit = { },
@@ -137,15 +136,13 @@ fun NoteScreen(
                     keyboardActions = KeyboardActions(onDone = { onNoteSaved() }),
                 )
 
-                if (isNewNote) {
-                    Button(
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(bottom = 48.dp),
-                        onClick = { onNoteSaved() },
-                    ) {
-                        Text("Save new note")
-                    }
+                Button(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 48.dp),
+                    onClick = { onNoteSaved() },
+                ) {
+                    Text("Save new note")
                 }
             }
         },

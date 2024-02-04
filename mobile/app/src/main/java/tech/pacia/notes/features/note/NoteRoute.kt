@@ -41,7 +41,6 @@ fun NoteRoute(
             is NoteState.Success -> state.isEdited
             else -> false
         },
-        isNewNote = id == null,
         onTitleEdited = noteViewModel::onTitleEdited,
         onContentEdited = noteViewModel::onContentEdited,
         onNoteSaved = noteViewModel::saveNote,
