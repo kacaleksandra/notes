@@ -3,14 +3,14 @@ FROM node:20-alpine AS builder
 # Create app directory
 WORKDIR /app
 
-# Copy only the required source files needed for build
+# Copy only the source files required for dependencies install
 COPY package.json package-lock.json tsconfig.json ./
 COPY prisma ./prisma
+RUN npm ci
+
+# Copy only the source files required for build
 COPY src ./src
 COPY common ./common
-
-# Install dependencies and build app
-RUN npm ci
 RUN npm run build
 
 FROM node:20-alpine AS runtime
