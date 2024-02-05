@@ -98,7 +98,7 @@ class MainActivity : ComponentActivity() {
                             "Notif perm granted: $granted",
                             Toast.LENGTH_SHORT,
                         ).show()
-                    }
+                    },
                 )
 
                 LaunchedEffect(key1 = "test") {
