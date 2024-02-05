@@ -6,9 +6,9 @@ import { NotificationsService } from 'src/notifications/notifications.service';
 export class NotificationSchedulerService {
   constructor(private readonly notificationsService: NotificationsService) {}
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   async handleCron() {
-    console.log('Running every minute');
+    console.log('Running every 10 seconds');
     await this.notificationsService.checkAndSendNotifications();
   }
 }
