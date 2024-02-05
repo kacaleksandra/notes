@@ -17,4 +17,10 @@ class NotificationsRepository(private val apiClient: NotesApi) {
     suspend fun deleteNotification(notificationId: Int) {
         callSafely { apiClient.deleteNotification(id = notificationId) }
     }
+
+    suspend fun createToken(token: String) {
+        callSafely {
+            apiClient.createToken(CreateTokenRequest(token = token))
+        }
+    }
 }

@@ -1,16 +1,29 @@
 package tech.pacia.notes
 
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.content.ContextCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.launch
 import tech.pacia.notes.data.AuthRepository
 import tech.pacia.notes.data.NotesApiClient
 import tech.pacia.notes.data.NotesRepository
@@ -56,9 +69,76 @@ class MainActivity : ComponentActivity() {
             apiClient = apiClient,
         )
 
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(
+            OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.w(this::class.simpleName, "fetch FCM token failed", task.exception)
+                    return@OnCompleteListener
+                }
+
+                val token = task.result
+
+                lifecycleScope.launch {
+                    globalNotificationsRepository.createToken(token)
+                    Log.d(this::class.simpleName, "Sent FCM token to server")
+                }
+
+                Log.d(this::class.simpleName, "Got token: $token")
+                Toast.makeText(baseContext, "Got token: $token", Toast.LENGTH_SHORT).show()
+            },
+        )
+
         setContent {
             NotesTheme {
+                val launcher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.RequestPermission(),
+                    onResult = { granted ->
+                        Toast.makeText(
+                            baseContext,
+                            "Notif perm granted: $granted",
+                            Toast.LENGTH_SHORT,
+                        ).show()
+                    }
+                )
+
+                LaunchedEffect(key1 = "test") {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        launcher.launch(POST_NOTIFICATIONS)
+                    }
+                }
+
                 NotesNavHost()
+            }
+        }
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            // FCM SDK (and your app) can post notifications.
+        } else {
+            // Inform user that that your app will not show notifications.
+            Toast.makeText(baseContext, "No notification permission granted", Toast.LENGTH_SHORT)
+                .show()
+
+            askNotificationPermission()
+        }
+    }
+
+    private fun askNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val result = ContextCompat.checkSelfPermission(this, POST_NOTIFICATIONS)
+            if (result == PackageManager.PERMISSION_GRANTED) {
+                // FCM SDK (and your app) can post notifications.
+            } else if (shouldShowRequestPermissionRationale(POST_NOTIFICATIONS)) {
+                // TODO: display an educational UI explaining to the user the features that will be enabled
+                //       by them granting the POST_NOTIFICATION permission. This UI should provide the user
+                //       "OK" and "No thanks" buttons. If the user selects "OK," directly request the permission.
+                //       If the user selects "No thanks," allow the user to continue without notifications.
+            } else {
+                // Directly ask for the permission
+                requestPermissionLauncher.launch(POST_NOTIFICATIONS)
             }
         }
     }
