@@ -87,13 +87,11 @@ export class NotificationsService {
 
   async checkAndSendNotifications() {
     const currentDateTime = new Date();
-    const warsawTime = currentDateTime.getTime() + 60 * 60 * 1000;
-
     const reminders = await this.prisma.reminders.findMany({
       where: {
         date: {
-          gte: new Date(warsawTime - 60000),
-          lte: new Date(warsawTime + 60000),
+          gte: new Date(currentDateTime.getTime() - 10000),
+          lte: new Date(currentDateTime.getTime() + 10000),
         },
       },
       include: {
@@ -106,6 +104,7 @@ export class NotificationsService {
       },
     });
 
+    console.log(`There are ${reminders.length} reminders`);
     for (const reminder of reminders) {
       const { userId, noteId, note } = reminder;
 
@@ -119,6 +118,8 @@ export class NotificationsService {
 
       // send notification to every token for the user
       for (const token of tokens) {
+        console.log(`Sending notification to FCM token ${token.token}`);
+
         const payload = {
           token: token.token,
           notification: {
