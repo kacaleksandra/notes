@@ -47,6 +47,7 @@ fun NoteRoute(
         onTitleEdited = noteViewModel::onTitleEdited,
         onContentEdited = noteViewModel::onContentEdited,
         onNoteSaved = noteViewModel::saveNote,
+        onCreateNotification = noteViewModel::createNotification,
         onNavigateUp = onNavigateUp,
     )
 }
