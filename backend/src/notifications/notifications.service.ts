@@ -106,6 +106,8 @@ export class NotificationsService {
       },
     });
 
+    console.log(`checkAndSendNotifications: ${reminders.length} reminders`)
+
     for (const reminder of reminders) {
       const { userId, noteId, note } = reminder;
 
