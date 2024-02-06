@@ -10,7 +10,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import tech.pacia.notes.ui.theme.NotesTheme
 
 @Composable
-fun SignInRoute(onNavigateToHome: () -> Unit = {}) {
+fun SignInRoute(
+    onNavigateToHome: () -> Unit = {},
+    onNavigateToSignUp: () -> Unit = {},
+) {
     val signInViewModel: SignInViewModel = viewModel(
         modelClass = SignInViewModel::class.java,
         factory = SignInViewModel.Factory,
@@ -29,6 +32,7 @@ fun SignInRoute(onNavigateToHome: () -> Unit = {}) {
         onDismissError = signInViewModel::dismissError,
         onSignInSubmitted = signInViewModel::signIn,
         signInState = signInState,
+        onNavigateToSignUp = onNavigateToSignUp,
     )
 }
 
