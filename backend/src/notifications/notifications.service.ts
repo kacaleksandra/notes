@@ -90,7 +90,7 @@ export class NotificationsService {
     const reminders = await this.prisma.reminders.findMany({
       where: {
         date: {
-          gte: new Date(currentDateTime.getTime() - 10000),
+          gte: new Date(currentDateTime.getTime()),
           lte: new Date(currentDateTime.getTime() + 10000),
         },
       },

@@ -3,6 +3,8 @@ complexity:
     active: false
   LongParameterList:
     active: false
+  TooManyFunctions:
+    active: false
 
 formatting:
   TrailingCommaOnCallSite:
@@ -24,3 +26,5 @@ style:
       - 'Preview'
   ForbiddenComment:
     allowedPatterns: 'TODO:'
+  CascadingCallWrapping:
+    active: true

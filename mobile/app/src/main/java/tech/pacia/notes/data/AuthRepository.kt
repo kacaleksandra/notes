@@ -1,7 +1,6 @@
 package tech.pacia.notes.data
 
-import retrofit2.HttpException
-import retrofit2.Response
+import kotlinx.coroutines.flow.Flow
 
 data class User(
     val email: String,
@@ -12,23 +11,7 @@ class AuthRepository(
     private val apiClient: NotesApi,
     private val tokenStore: TokenStore,
 ) {
-
-    /*fun accessToken(): String? {
-        return runBlocking { dataStore.data.first()[PreferencesKeys.USER_ACCESS_TOKEN] }
-    }
-
-
-    val userFlow: Flow<User?> = dataStore.data.map { preferences ->
-        val accessToken = preferences[PreferencesKeys.USER_ACCESS_TOKEN]
-        val email = preferences[PreferencesKeys.USER_EMAIL]
-        if (accessToken == null || email == null) {
-            return@map null
-        }
-
-        return@map User(
-            email = email, accessToken = accessToken
-        )
-    }*/
+    fun accessToken(): Flow<String?> = tokenStore.accessTokenUpdates()
 
     suspend fun signUp(email: String, password: String): NetworkResult<Unit> {
         return callSafely {
@@ -43,11 +26,6 @@ class AuthRepository(
 
         when (result) {
             is Success -> tokenStore.persistToken(result.data.accessToken)
-            /*dataStore.edit { preferences ->
-                preferences[PreferencesKeys.USER_ACCESS_TOKEN] = result.data.accessToken
-                preferences[PreferencesKeys.USER_EMAIL] = result.data.email
-            }*/
-
             else -> Unit
         }
 
@@ -55,21 +33,4 @@ class AuthRepository(
     }
 
     suspend fun signOut() = tokenStore.clearToken()
-
-    @Suppress("TooGenericExceptionCaught")
-    private suspend fun <T : Any> callSafely(apiMethod: suspend () -> Response<T>): NetworkResult<T> {
-        return try {
-            val response = apiMethod()
-            val body = response.body()
-            if (response.isSuccessful && body != null) {
-                Success(body)
-            } else {
-                Error(code = response.code(), message = response.message())
-            }
-        } catch (e: HttpException) {
-            Error(code = e.code(), message = e.message())
-        } catch (e: Throwable) {
-            Exception(e)
-        }
-    }
 }

@@ -4,7 +4,9 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 
 class TokenStore(
@@ -13,6 +15,12 @@ class TokenStore(
     private object PreferencesKeys {
         val USER_ACCESS_TOKEN = stringPreferencesKey("user_access_token")
         val USER_EMAIL = stringPreferencesKey("user_email")
+    }
+
+    fun accessTokenUpdates(): Flow<String?> {
+        return dataStore.data.map { preferences ->
+            preferences[PreferencesKeys.USER_ACCESS_TOKEN]
+        }
     }
 
     fun accessToken(): String? {

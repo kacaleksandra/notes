@@ -16,6 +16,8 @@ retrofit = "2.9.0"
 okhttp = "5.0.0-alpha.12"
 retrofit2-kotlinx-serialization-converter = "1.0.0"
 datastore = "1.0.0"
+gms = "4.4.0"
+firebase-bom = "32.7.1"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -42,12 +44,15 @@ retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = 
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 retrofit2-kotlinx-serialization-converter = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofit2-kotlinx-serialization-converter" }
 datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
+firebase-cloud-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+googleMobileServices = { id = "com.google.gms.google-services", version.ref = "gms" }
 
 [bundles]
 retrofit = ["retrofit", "okhttp", "kotlinx-serialization-json", "retrofit2-kotlinx-serialization-converter"]

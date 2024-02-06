@@ -45,9 +45,8 @@ fun NotesNavHost(navController: NavHostController = rememberNavController()) {
             )
         }
         composable(Destinations.NOTE_ROUTE) {
-            val id = it.arguments?.getString("id") ?: "empty"
             NoteRoute(
-                id = id,
+                id = it.arguments?.getString("id")?.toIntOrNull(),
                 onNavigateUp = { navController.popBackStack() },
             )
         }

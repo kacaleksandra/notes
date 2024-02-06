@@ -1,13 +1,12 @@
 package tech.pacia.notes.features.home
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun HomeRoute(
-    onNavigateToNote: (noteId: String) -> Unit,
+    onNavigateToNote: (noteId: Int?) -> Unit,
     onSignOut: () -> Unit,
 ) {
     val homeViewModel = viewModel(
@@ -15,14 +14,18 @@ fun HomeRoute(
         factory = HomeViewModel.Factory,
     )
 
-    val notesUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+    val uiState = homeViewModel.uiState.collectAsStateWithLifecycle()
 
     HomeScreen(
-        notesUiState = notesUiState,
-        onCategoryClick = homeViewModel::toggleCategorySelected,
+        uiState = uiState.value,
         onNavigateToNote = onNavigateToNote,
-        onDeleteNote = homeViewModel::deleteNote,
+        onDeleteSelectedNotes = homeViewModel::deleteSelectedNotes,
+        onSelectNote = homeViewModel::selectNote,
+        onSelectCategory = homeViewModel::selectCategory,
         onRefresh = homeViewModel::refresh,
-        onSignOut = onSignOut,
+        onSignOut = {
+            homeViewModel.signOut()
+            onSignOut()
+        },
     )
 }

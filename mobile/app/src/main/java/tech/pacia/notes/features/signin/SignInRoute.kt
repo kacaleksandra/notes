@@ -17,9 +17,10 @@ fun SignInRoute(onNavigateToHome: () -> Unit = {}) {
     )
 
     val signInState by signInViewModel.uiState.collectAsStateWithLifecycle()
+    val token by signInViewModel.token.collectAsStateWithLifecycle(initialValue = null)
 
-    LaunchedEffect(signInState) {
-        if (signInState is SignInState.Success) {
+    LaunchedEffect(token) {
+        if (token != null) {
             onNavigateToHome()
         }
     }

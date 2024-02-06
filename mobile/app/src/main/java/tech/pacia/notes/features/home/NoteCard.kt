@@ -1,6 +1,7 @@
 package tech.pacia.notes.features.home
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,28 +12,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.Card
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import tech.pacia.notes.data.Note
-import tech.pacia.notes.data.NotesRepository
-import tech.pacia.notes.ui.theme.NotesTheme
 
 @OptIn(
     ExperimentalFoundationApi::class,
@@ -42,18 +34,24 @@ import tech.pacia.notes.ui.theme.NotesTheme
 @Composable
 fun NoteCard(
     modifier: Modifier = Modifier,
-    note: Note,
+    note: DisplayNote,
     onClick: () -> Unit = {},
-    onDelete: () -> Unit = {},
+    onSelect: () -> Unit = {},
+    onCategoryClick: ((categoryId: Int) -> Unit)? = {},
+    selected: Boolean = false,
 ) {
-    val expanded = remember { mutableStateOf(false) }
+    val borderColor by animateColorAsState(
+        targetValue = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent,
+        label = "border animation",
+    )
 
     Card(
         modifier = modifier.combinedClickable(
             onClick = onClick,
-            onLongClick = { expanded.value = true },
+            onLongClick = onSelect,
         ),
         shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(width = 1.dp, color = borderColor),
     ) {
         Column(
             modifier = Modifier.padding(8.dp),
@@ -81,37 +79,30 @@ fun NoteCard(
                     CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
                         FilterChip(
                             selected = true,
-                            onClick = { },
-                            label = { Text(category) },
+                            onClick = { onCategoryClick?.invoke(category.id) },
+                            label = { Text(category.title) },
                         )
                     }
                 }
             }
         }
-
-        DropdownMenu(
-            expanded = expanded.value,
-            onDismissRequest = { expanded.value = false },
-        ) {
-            DropdownMenuItem(
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Rounded.Delete,
-                        contentDescription = "Delete note - trach icon",
-                    )
-                },
-                text = { Text("Delete note") },
-                onClick = onDelete,
-            )
-        }
     }
 }
 
+/*
 @Preview(showBackground = true)
 @Composable
 fun NoteCardPreview() {
     NotesTheme {
         NoteCard(note = NotesRepository.notes.first())
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun NoteCardSelectedPreview() {
+    NotesTheme {
+        NoteCard(note = NotesRepository.notes.first(), selected = true)
     }
 }
 
@@ -122,3 +113,4 @@ fun NoteCardPreviewDark() {
         NoteCard(note = NotesRepository.notes.last())
     }
 }
+*/
