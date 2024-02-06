@@ -123,6 +123,15 @@ fun SignInScreen(
             ) {
                 Text("Sign in")
             }
+
+            Button(
+                onClick = { onSignInSubmitted(username, password) },
+                modifier = Modifier
+                    .fillMaxWidth(fraction = 0.75f)
+                    .padding(8.dp),
+            ) {
+                Text("Create a new account")
+            }
         }
     }
 
