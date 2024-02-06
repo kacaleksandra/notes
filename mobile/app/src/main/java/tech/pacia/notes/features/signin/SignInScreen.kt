@@ -55,8 +55,9 @@ fun SignInScreen(
     onDismissError: () -> Unit = {},
     onSignInSubmitted: (email: String, password: String) -> Unit = { _, _ -> },
     signInState: SignInState = SignInState.Loading,
+    onNavigateToSignUp: () -> Unit = {},
 ) {
-    var username by rememberSaveable { mutableStateOf("") }
+    var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var showPassword by rememberSaveable { mutableStateOf(false) }
 
@@ -78,13 +79,13 @@ fun SignInScreen(
         ) {
             OutlinedTextField(
                 modifier = Modifier.padding(8.dp),
-                value = username,
-                onValueChange = { username = it },
-                label = { Text("Username") },
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Rounded.Person,
-                        contentDescription = "Username",
+                        contentDescription = "Email",
                     )
                 },
             )
@@ -116,7 +117,7 @@ fun SignInScreen(
             )
 
             Button(
-                onClick = { onSignInSubmitted(username, password) },
+                onClick = { onSignInSubmitted(email, password) },
                 modifier = Modifier
                     .fillMaxWidth(fraction = 0.75f)
                     .padding(8.dp),
@@ -125,12 +126,12 @@ fun SignInScreen(
             }
 
             Button(
-                onClick = { onSignInSubmitted(username, password) },
+                onClick = onNavigateToSignUp,
                 modifier = Modifier
                     .fillMaxWidth(fraction = 0.75f)
                     .padding(8.dp),
             ) {
-                Text("Create a new account")
+                Text("Create new account")
             }
         }
     }
