@@ -11,24 +11,7 @@ class AuthRepository(
     private val apiClient: NotesApi,
     private val tokenStore: TokenStore,
 ) {
-
-//    fun accessToken(): String? {
-//        return runBlocking { dataStore.data.first()[PreferencesKeys.USER_ACCESS_TOKEN] }
-//    }
-
     fun accessToken(): Flow<String?> = tokenStore.accessTokenUpdates()
-
-    /* val userFlow: Flow<User?> = dataStore.data.map { preferences ->
-         val accessToken = preferences[PreferencesKeys.USER_ACCESS_TOKEN]
-         val email = preferences[PreferencesKeys.USER_EMAIL]
-         if (accessToken == null || email == null) {
-             return@map null
-         }
-
-         return@map User(
-             email = email, accessToken = accessToken
-         )
-     }*/
 
     suspend fun signUp(email: String, password: String): NetworkResult<Unit> {
         return callSafely {
@@ -43,11 +26,6 @@ class AuthRepository(
 
         when (result) {
             is Success -> tokenStore.persistToken(result.data.accessToken)
-            /*dataStore.edit { preferences ->
-                preferences[PreferencesKeys.USER_ACCESS_TOKEN] = result.data.accessToken
-                preferences[PreferencesKeys.USER_EMAIL] = result.data.email
-            }*/
-
             else -> Unit
         }
 
