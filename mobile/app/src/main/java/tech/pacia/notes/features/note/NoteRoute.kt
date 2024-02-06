@@ -40,8 +40,8 @@ fun NoteRoute(
             is NoteState.Success -> state.isEdited
             else -> false
         },
-        categories = when (val state = uiState) {
-            is NoteState.Success -> state.categories
+        allCategories = when (val state = uiState) {
+            is NoteState.Success -> state.allCategories
             else -> listOf()
         },
         onTitleEdited = noteViewModel::onTitleEdited,
