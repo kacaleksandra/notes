@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -15,48 +14,38 @@ import tech.pacia.notes.data.Exception
 import tech.pacia.notes.data.Success
 import tech.pacia.notes.globalAuthRepository
 
-sealed interface SignUpState {
-    data object Neutral : SignUpState
-    data object Loading : SignUpState
-    data class Error(val message: String) : SignUpState
-    data object Success : SignUpState
-}
+data class SignUpState(
+    val isLoading: Boolean = false,
+    val error: String? = null,
+)
 
 class SignUpViewModel(private val authRepository: AuthRepository) : ViewModel() {
-    private val _uiState: MutableStateFlow<SignUpState> = MutableStateFlow(SignUpState.Neutral)
+    private var _uiState: MutableStateFlow<SignUpState> = MutableStateFlow(SignUpState())
     val uiState: StateFlow<SignUpState> = _uiState
-
-    val token: Flow<String?> = authRepository.accessToken()
 
     fun signUp(email: String, password: String) {
         viewModelScope.launch {
-            _uiState.value = SignUpState.Loading
+            _uiState.value = SignUpState(isLoading = true)
 
             if (email.isBlank() || password.isBlank()) {
-                _uiState.value = SignUpState.Error("Email and password fields must not be empty")
+                _uiState.value = SignUpState(error = "Email and password fields must not be empty")
                 return@launch
             }
 
-            if (email == "a" && password == "a") {
-                _uiState.value = SignUpState.Success
-                return@launch
-            }
-
-            val result = authRepository.signUp(email, password)
-            when (result) {
+            when (val result = authRepository.signUp(email, password)) {
                 is Exception -> {
                     Log.d(this::class.simpleName, "Failed to sign in: ${result.e}")
-                    _uiState.value = SignUpState.Error("Fatal error while signing in")
+                    _uiState.value = SignUpState(error = "Fatal error while signing in")
                 }
 
-                is Error -> _uiState.value = SignUpState.Error(result.message ?: "Sign in failed")
-                is Success -> _uiState.value = SignUpState.Success
+                is Error -> _uiState.value = SignUpState(error = result.message ?: "Sign in failed")
+                is Success -> _uiState.value = SignUpState()
             }
         }
     }
 
-    fun dismissError() {
-        _uiState.value = SignUpState.Neutral
+    fun toggleLoading() {
+        _uiState.value = SignUpState(isLoading = !_uiState.value.isLoading)
     }
 
     companion object {

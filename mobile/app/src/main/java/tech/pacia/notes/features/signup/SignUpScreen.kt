@@ -1,19 +1,25 @@
 package tech.pacia.notes.features.signup
 
 import android.content.res.Configuration
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,6 +34,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
@@ -35,29 +42,41 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import tech.pacia.notes.features.signin.SignInScreen
 import tech.pacia.notes.ui.theme.NotesTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(
     modifier: Modifier = Modifier,
+    uiState: SignUpState = SignUpState(),
     onSignUpSubmitted: (email: String, password: String) -> Unit = { _, _ -> },
     onNavigateBack: () -> Unit = {},
+    toggle: () -> Unit = {},
 ) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var confirmPassword by rememberSaveable { mutableStateOf("") }
     var showPassword by rememberSaveable { mutableStateOf(false) }
+    val arePasswordsTheSame = password == confirmPassword
 
     val localFocusManager = LocalFocusManager.current
 
+    val blurRadius by animateDpAsState(
+        targetValue = if (uiState.isLoading) 10.dp else 0.dp,
+        label = "Blur",
+    )
+
     Scaffold(
-        modifier = modifier.pointerInput(Unit) {
-            detectTapGestures(
-                onTap = { localFocusManager.clearFocus() },
-            )
-        },
+        modifier = modifier
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = {
+                        localFocusManager.clearFocus()
+                        toggle()
+                    },
+                )
+            }
+            .blur(blurRadius),
         topBar = {
             TopAppBar(
                 title = { Text("Create new Notes account") },
@@ -143,16 +162,38 @@ fun SignUpScreen(
                     Text("Show password")
                 }
 
+                Spacer(Modifier.weight(1f))
+
+                if (!arePasswordsTheSame) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                    ) {
+                        Icon(Icons.Default.Warning, contentDescription = "Warning")
+                        Text("Passwords do not match")
+                    }
+                }
+
                 Button(
-                    onClick = { onSignUpSubmitted(email, password) },
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .fillMaxWidth(fraction = 0.65f)
                         .padding(8.dp),
+                    enabled = arePasswordsTheSame,
+                    onClick = { onSignUpSubmitted(email, password) },
                 ) {
                     Text("Create")
                 }
             }
+        }
+    }
+
+    if (uiState.isLoading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator()
         }
     }
 }
@@ -161,7 +202,7 @@ fun SignUpScreen(
 @Composable
 fun SignInScreenPreview() {
     NotesTheme {
-        SignInScreen()
+        SignUpScreen()
     }
 }
 
@@ -169,6 +210,6 @@ fun SignInScreenPreview() {
 @Composable
 fun SignInScreenInProgressPreview() {
     NotesTheme {
-        SignInScreen()
+        SignUpScreen(uiState = SignUpState(isLoading = true))
     }
 }
