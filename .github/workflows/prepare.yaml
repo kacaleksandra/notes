@@ -55,3 +55,56 @@ jobs:
 
       - name: Build project
         run: npm run build
+
+  main-backend-docker:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      PROJECT_ID: ${{ secrets.PROJECT_ID }}
+      CLIENT_EMAIL: ${{ secrets.CLIENT_EMAIL }}
+      PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+      JWT_SECRET: "9B783CEB90A618BF47C7B22684AD10BE6DF29B60A0724B3A6DEB226967A9DCD8"
+      POSTGRES_USER: "prisma"
+      POSTGRES_PASSWORD: "prisma123"
+      POSTGRES_DB: "notes"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build and run Docker Compose
+        run: |
+          docker-compose up --force-recreate -d
+
+      - name: Check if containers are deployed
+        run: |
+          echo ${PROJECT_ID};
+          echo ${CLIENT_EMAIL};
+          echo ${PRIVATE_KEY};
+          docker ps
+      - name: Wait for app to be ready
+        run: |
+          until curl -sSf http://localhost:3000/api; do
+            docker logs --since 1s backend_app_1
+            sleep 1
+          done
+
+      - name: Create user
+        run: |
+          curl --location 'localhost:3000/api/users' \
+          --header 'Content-Type: application/json' \
+          --data-raw '{
+              "email": "test@polsl.pl",
+              "password": "test1234"
+          }'
+
+      - name: Log in user
+        run: |
+          curl --location 'localhost:3000/api/auth/login' \
+          --header 'Content-Type: application/json' \
+          --data-raw '{
+            "email": "test@polsl.pl",
+            "password": "test1234"
+          }'
