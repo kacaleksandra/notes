@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -64,16 +65,18 @@ fun SignInScreen(
     val localFocusManager = LocalFocusManager.current
 
     Scaffold(
-        modifier = modifier.pointerInput(Unit) {
-            detectTapGestures(
-                onTap = { localFocusManager.clearFocus() },
-            )
-        },
+        modifier = modifier
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = { localFocusManager.clearFocus() },
+                )
+            },
         topBar = { TopAppBar(title = { Text("Sign in to Notes") }) },
     ) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
+                .imePadding()
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -133,6 +136,10 @@ fun SignInScreen(
             ) {
                 Text("Create new account")
             }
+
+            Spacer(Modifier.weight(1f))
+
+            Text(text = "XDXDXDXDXDX")
         }
     }
 

@@ -1,7 +1,10 @@
 package tech.pacia.notes.features.signup
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -35,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
@@ -166,10 +171,15 @@ fun SignUpScreen(
 
                 if (!arePasswordsTheSame) {
                     Row(
+                        modifier = Modifier.fillMaxWidth(fraction = 0.7f),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Start,
                     ) {
-                        Icon(Icons.Default.Warning, contentDescription = "Warning")
+                        Icon(
+                            Icons.Default.Warning,
+                            contentDescription = "Warning",
+                            tint = Color.Red,
+                        )
                         Text("Passwords do not match")
                     }
                 }
@@ -177,8 +187,8 @@ fun SignUpScreen(
                 Button(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .fillMaxWidth(fraction = 0.65f)
-                        .padding(8.dp),
+                        .fillMaxWidth(fraction = 0.7f)
+                        .padding(16.dp),
                     enabled = arePasswordsTheSame,
                     onClick = { onSignUpSubmitted(email, password) },
                 ) {
@@ -188,10 +198,16 @@ fun SignUpScreen(
         }
     }
 
-    if (uiState.isLoading) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding(),
+    ) {
+        AnimatedVisibility(
+            modifier = Modifier.align(Alignment.Center),
+            visible = uiState.isLoading,
+            enter = fadeIn(),
+            exit = fadeOut(),
         ) {
             CircularProgressIndicator()
         }
