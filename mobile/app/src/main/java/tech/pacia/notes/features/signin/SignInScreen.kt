@@ -138,8 +138,6 @@ fun SignInScreen(
             }
 
             Spacer(Modifier.weight(1f))
-
-            Text(text = "XDXDXDXDXDX")
         }
     }
 
