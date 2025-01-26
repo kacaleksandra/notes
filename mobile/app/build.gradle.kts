@@ -76,6 +76,8 @@ tasks.withType<Detekt>().configureEach {
 //}
 
 dependencies {
+    implementation(project(":flutter"))
+
     implementation(libs.core.ktx)
     // implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.lifecycle.runtime.compose)

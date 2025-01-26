@@ -47,6 +47,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import tech.pacia.notes.ui.theme.NotesTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -138,6 +139,14 @@ fun SignInScreen(
             }
 
             Spacer(Modifier.weight(1f))
+
+            Button(onClick = {
+                startActivity(
+                    FlutterActivity.createDefaultIntent(this)
+                )
+            }) {
+                Text("Launch Flutter!")
+            }
         }
     }
 
