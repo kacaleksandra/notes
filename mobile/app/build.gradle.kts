@@ -1,6 +1,9 @@
+import io.gitlab.arturbosch.detekt.Detekt
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.composeCompiler)
     alias(libs.plugins.detekt)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.googleMobileServices)
@@ -8,12 +11,12 @@ plugins {
 
 android {
     namespace = "tech.pacia.notes"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "tech.pacia.notes"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -48,10 +51,6 @@ android {
         compose = true
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.7"
-    }
-
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -63,6 +62,11 @@ detekt {
     config.setFrom(file("../detekt.yaml"))
     buildUponDefaultConfig = true
     autoCorrect = true
+}
+
+tasks.withType<Detekt>().configureEach {
+    // Target version of the generated JVM bytecode. It is used for type resolution.
+    jvmTarget = "11"
 }
 
 //java {
