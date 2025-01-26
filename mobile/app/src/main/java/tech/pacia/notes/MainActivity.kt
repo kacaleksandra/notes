@@ -84,6 +84,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 Log.d(this::class.simpleName, "Got token: $token")
+
                 Toast.makeText(baseContext, "Got token: $token", Toast.LENGTH_SHORT).show()
             },
         )

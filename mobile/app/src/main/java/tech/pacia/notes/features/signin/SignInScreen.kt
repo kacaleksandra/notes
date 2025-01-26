@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -55,36 +56,39 @@ fun SignInScreen(
     onDismissError: () -> Unit = {},
     onSignInSubmitted: (email: String, password: String) -> Unit = { _, _ -> },
     signInState: SignInState = SignInState.Loading,
+    onNavigateToSignUp: () -> Unit = {},
 ) {
-    var username by rememberSaveable { mutableStateOf("") }
+    var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var showPassword by rememberSaveable { mutableStateOf(false) }
 
     val localFocusManager = LocalFocusManager.current
 
     Scaffold(
-        modifier = modifier.pointerInput(Unit) {
-            detectTapGestures(
-                onTap = { localFocusManager.clearFocus() },
-            )
-        },
+        modifier = modifier
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = { localFocusManager.clearFocus() },
+                )
+            },
         topBar = { TopAppBar(title = { Text("Sign in to Notes") }) },
     ) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
+                .imePadding()
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             OutlinedTextField(
                 modifier = Modifier.padding(8.dp),
-                value = username,
-                onValueChange = { username = it },
-                label = { Text("Username") },
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Rounded.Person,
-                        contentDescription = "Username",
+                        contentDescription = "Email",
                     )
                 },
             )
@@ -116,13 +120,26 @@ fun SignInScreen(
             )
 
             Button(
-                onClick = { onSignInSubmitted(username, password) },
+                onClick = { onSignInSubmitted(email, password) },
                 modifier = Modifier
                     .fillMaxWidth(fraction = 0.75f)
                     .padding(8.dp),
             ) {
                 Text("Sign in")
             }
+
+            Button(
+                onClick = onNavigateToSignUp,
+                modifier = Modifier
+                    .fillMaxWidth(fraction = 0.75f)
+                    .padding(8.dp),
+            ) {
+                Text("Create new account")
+            }
+
+            Spacer(Modifier.weight(1f))
+
+            Text(text = "XDXDXDXDXDX")
         }
     }
 

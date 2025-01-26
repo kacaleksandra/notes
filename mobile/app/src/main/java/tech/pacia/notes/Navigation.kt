@@ -8,9 +8,11 @@ import androidx.navigation.compose.rememberNavController
 import tech.pacia.notes.features.home.HomeRoute
 import tech.pacia.notes.features.note.NoteRoute
 import tech.pacia.notes.features.signin.SignInRoute
+import tech.pacia.notes.features.signup.SignUpRoute
 
 private object Destinations {
     const val SIGN_IN_ROUTE = "signin"
+    const val SIGN_UP_ROUTE = "signup"
     const val HOME_ROUTE = "home/"
     const val NOTE_ROUTE = "note/{id}"
 }
@@ -25,6 +27,24 @@ fun NotesNavHost(navController: NavHostController = rememberNavController()) {
             SignInRoute(
                 onNavigateToHome = {
                     navController.navigate(Destinations.HOME_ROUTE) {
+                        popUpTo(Destinations.SIGN_IN_ROUTE) {
+                            inclusive = true
+                        }
+                    }
+                },
+                onNavigateToSignUp = {
+                    navController.navigate(Destinations.SIGN_UP_ROUTE) {
+                        popUpTo(Destinations.SIGN_UP_ROUTE) {
+                            inclusive = true
+                        }
+                    }
+                },
+            )
+        }
+        composable(Destinations.SIGN_UP_ROUTE) {
+            SignUpRoute(
+                onNavigateBack = {
+                    navController.navigate(Destinations.SIGN_IN_ROUTE) {
                         popUpTo(Destinations.SIGN_IN_ROUTE) {
                             inclusive = true
                         }

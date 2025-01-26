@@ -40,6 +40,7 @@ sealed interface NoteState {
         val content: String,
         val createdAt: Instant?,
         val categories: List<DisplayCategory>,
+        val allCategories: List<DisplayCategory>,
         val isEdited: Boolean,
     ) : NoteState
 }
@@ -61,20 +62,6 @@ class NoteViewModel(
 
     @Suppress("SwallowedException", "TooGenericExceptionCaught")
     fun initialize() = viewModelScope.launch {
-        val noteId = this@NoteViewModel.noteId
-        if (noteId == null) {
-            _uiState.value = NoteState.Success(
-                title = "",
-                content = "",
-                categories = listOf(),
-                createdAt = null,
-                isEdited = false,
-            )
-            return@launch
-        }
-
-        _uiState.value = NoteState.Loading
-
         val categories = when (val response = notesRepository.readCategories()) {
             is Success -> response.data
             is tech.pacia.notes.data.Error -> {
@@ -99,6 +86,21 @@ class NoteViewModel(
                 return@launch
             }
         }
+
+        val noteId = this@NoteViewModel.noteId
+        if (noteId == null) {
+            _uiState.value = NoteState.Success(
+                title = "",
+                content = "",
+                categories = listOf(),
+                allCategories = categories.map { DisplayCategory.fromCategory(it) },
+                createdAt = null,
+                isEdited = false,
+            )
+            return@launch
+        }
+
+        _uiState.value = NoteState.Loading
 
         val note = when (val response = notesRepository.readNote(noteId)) {
             is Success ->
@@ -139,6 +141,7 @@ class NoteViewModel(
             title = note.title,
             content = note.content,
             categories = note.categories.map { DisplayCategory.fromCategory(it) },
+            allCategories = categories.map { DisplayCategory.fromCategory(it) },
             createdAt = note.createdAt,
             isEdited = false,
         )

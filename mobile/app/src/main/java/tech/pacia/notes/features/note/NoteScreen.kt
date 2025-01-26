@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.rounded.Info
@@ -64,7 +65,7 @@ fun NoteScreen(
     title: String = "",
     content: String = "",
     createdAt: Instant? = null,
-    categories: List<DisplayCategory> = listOf(),
+    allCategories: List<DisplayCategory> = listOf(),
     isEdited: Boolean = false,
     onNavigateUp: () -> Unit = {},
     onTitleEdited: (String) -> Unit = {},
@@ -261,12 +262,16 @@ fun NoteScreen(
                     .heightIn(max = 568.0.dp),
             ) {
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.Start,
                 ) {
                     Text("Select categories for this note")
 
-                    for (category in categories) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                    for (category in allCategories) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            // horizontalArrangement = Arrangement.Start,
+                        ) {
                             Checkbox(
                                 checked = category.selected,
                                 onCheckedChange = {
@@ -276,6 +281,11 @@ fun NoteScreen(
 
                             Text(category.title)
                         }
+                    }
+
+                    TextButton(onClick = { /* TODO */ }) {
+                        Icon(imageVector = Icons.Default.Add, contentDescription = "Plus icon")
+                        Text("Add new category")
                     }
 
                     TextButton(onClick = { showCategoryPickerDialog = false }) {
