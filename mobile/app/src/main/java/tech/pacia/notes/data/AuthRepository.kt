@@ -2,7 +2,6 @@ package tech.pacia.notes.data
 
 import kotlinx.coroutines.flow.Flow
 
-
 data class User(
     val email: String,
     val accessToken: String,

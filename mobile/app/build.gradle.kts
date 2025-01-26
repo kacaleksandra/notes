@@ -1,3 +1,5 @@
+import io.gitlab.arturbosch.detekt.Detekt
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
@@ -60,6 +62,11 @@ detekt {
     config.setFrom(file("../detekt.yaml"))
     buildUponDefaultConfig = true
     autoCorrect = true
+}
+
+tasks.withType<Detekt>().configureEach {
+    // Target version of the generated JVM bytecode. It is used for type resolution.
+    jvmTarget = "11"
 }
 
 //java {
