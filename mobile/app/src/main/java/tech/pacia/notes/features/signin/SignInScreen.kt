@@ -41,12 +41,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
+import io.flutter.embedding.android.FlutterActivity
 import tech.pacia.notes.ui.theme.NotesTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,6 +66,7 @@ fun SignInScreen(
     var showPassword by rememberSaveable { mutableStateOf(false) }
 
     val localFocusManager = LocalFocusManager.current
+    val context = LocalContext.current
 
     Scaffold(
         modifier = modifier
@@ -138,6 +142,14 @@ fun SignInScreen(
             }
 
             Spacer(Modifier.weight(1f))
+
+            Button(onClick = {
+                context.startActivity(
+                    FlutterActivity.createDefaultIntent(context),
+                )
+            }) {
+                Text("Launch Flutter!")
+            }
         }
     }
 
